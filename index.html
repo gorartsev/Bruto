@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>BRUTE — iOS strength journal</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<style>
+  html, body {
+    margin: 0; padding: 0; min-height: 100vh;
+    background: #1a1816;
+    font-family: 'Inter', system-ui, sans-serif;
+    color: #F4ECD8;
+  }
+  * { box-sizing: border-box; }
+  .stage {
+    min-height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+    padding: 40px 20px;
+  }
+  .phone-wrap { position: relative; }
+</style>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel" src="ios-frame.jsx"></script>
+<script type="text/babel" src="tweaks-panel.jsx"></script>
+<script type="text/babel" src="brute/i18n.jsx"></script>
+<script type="text/babel" src="brute/design-tokens.jsx"></script>
+<script type="text/babel" src="brute/flash.jsx"></script>
+<script type="text/babel" src="brute/primitives.jsx"></script>
+<script type="text/babel" src="brute/session-data.jsx"></script>
+<script type="text/babel" src="brute/screen-today.jsx"></script>
+<script type="text/babel" src="brute/screen-active.jsx"></script>
+<script type="text/babel" src="brute/screen-pr-complete.jsx"></script>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+
+// ══════════════════════════════════════════════════════════════
+// BRUTE — live app (no design canvas)
+// Single interactive phone, tweaks panel on the right.
+// ══════════════════════════════════════════════════════════════
+
+const TWEAK_DEFAULTS = {
+  accent: "#B3121A",
+  grit: 1,
+  stateCycle: "normal",
+  lang: "ru",
+};
+
+function LiveFlow({ tweaks }) {
+  const [screen, setScreen] = React.useState('today');
+  const [pr, setPR] = React.useState(null);
+
+  return (
+    <>
+      {screen === 'today' && (
+        <TodayScreen
+          accent={tweaks.accent}
+          grit={tweaks.grit}
+          lang={tweaks.lang}
+          onStartSession={() => setScreen('active')}
+        />
+      )}
+      {screen === 'active' && (
+        <ActiveWorkoutScreen
+          accent={tweaks.accent}
+          grit={tweaks.grit}
+          lang={tweaks.lang}
+          forceState={tweaks.stateCycle === 'resting' ? 'resting' : 'normal'}
+          onExit={() => setScreen('today')}
+          onPR={(p) => { setPR(p); setScreen('pr'); }}
+          onSessionComplete={() => setScreen('complete')}
+        />
+      )}
+      {screen === 'pr' && pr && (
+        <PRCelebration
+          pr={pr}
+          prev={PREV_PRS.bench}
+          accent={tweaks.accent}
+          lang={tweaks.lang}
+          onDismiss={() => setScreen('active')}
+        />
+      )}
+      {screen === 'complete' && (
+        <SessionComplete
+          accent={tweaks.accent}
+          lang={tweaks.lang}
+          onClose={() => setScreen('today')}
+        />
+      )}
+      {/* jump nav inside phone */}
+      <div style={{
+        position: 'absolute', bottom: 44, left: '50%', transform: 'translateX(-50%)', zIndex: 200,
+        display: 'flex', gap: 4, background: 'rgba(0,0,0,0.8)', padding: 4, borderRadius: 16,
+        border: `1px solid ${BRUTE.smoke}`,
+      }}>
+        {[
+          { id: 'today', label: 'T' },
+          { id: 'active', label: 'W' },
+          { id: 'pr', label: 'PR', setPR: { lift: 'BENCH', weight: 85, reps: 5, new1RM: 99 } },
+          { id: 'complete', label: '✓' },
+        ].map((s) => (
+          <button key={s.id} onClick={() => { if (s.setPR) setPR(s.setPR); setScreen(s.id); }}
+            style={{
+              width: 22, height: 22, borderRadius: '50%', border: 0,
+              background: screen === s.id ? tweaks.accent : BRUTE.smoke,
+              color: BRUTE.paper, fontSize: 9, cursor: 'pointer',
+              fontFamily: "'Bebas Neue', Impact", letterSpacing: '0.04em',
+            }}>{s.label}</button>
+        ))}
+      </div>
+    </>
+  );
+}
+
+function App() {
+  const [t, setT] = useTweaks(TWEAK_DEFAULTS);
+  return (
+    <>
+      <style>{BRUTE_CSS}</style>
+      <div className="stage">
+        <div className="phone-wrap">
+          <IOSDevice width={402} height={874} dark={true}>
+            <LiveFlow tweaks={t}/>
+          </IOSDevice>
+        </div>
+      </div>
+
+      <TweaksPanel title="BRUTE · TWEAKS">
+        <TweakSection label="Language / Язык"/>
+        <TweakRadio label="Language" value={t.lang}
+          options={[
+            { value: 'en', label: 'EN' },
+            { value: 'ru', label: 'RU' },
+          ]}
+          onChange={(v) => setT('lang', v)}/>
+        <TweakSection label="Accent"/>
+        <TweakColor label="Primary" value={t.accent} onChange={(v) => setT('accent', v)}/>
+        <TweakRadio label="Accent preset" value={t.accent}
+          options={[
+            { value: '#B3121A', label: 'Blood' },
+            { value: '#E85C2C', label: 'Caution' },
+            { value: '#7A0C12', label: 'Bruise' },
+          ]}
+          onChange={(v) => setT('accent', v)}/>
+        <TweakSection label="Texture"/>
+        <TweakSlider label="Grit / halftone" value={t.grit} min={0} max={3} step={1}
+          onChange={(v) => setT('grit', v)}/>
+        <TweakSection label="Flow states"/>
+        <TweakRadio label="Active state" value={t.stateCycle}
+          options={['normal', 'resting']}
+          onChange={(v) => setT('stateCycle', v)}/>
+      </TweaksPanel>
+    </>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+
+</script>
+</body>
+</html>

@@ -4,43 +4,44 @@ iOS strength journal. Punk tattoo-zine aesthetic. Week 03, heavy bench.
 
 Designed in [claude.ai/design](https://claude.ai/design). HTML/CSS/JS prototype — React 18 via Babel standalone, no build step.
 
-## Run it
+**Live:** https://gorartsev.github.io/Bruto/
 
-Needs an HTTP server (browsers won't load `text/babel` from `file://`).
+## Run locally
+
+Browsers won't load `text/babel` from `file://`, so you need a tiny HTTP server:
 
 ```bash
 python -m http.server 8787
 ```
 
-Open `http://localhost:8787/BRUTE.html`.
+Open `http://localhost:8787/`.
 
 ## Core loop
 
 Today → Active Workout → PR Celebration → Session Complete.
 
-- Tap rep cells to complete reps
-- Log Set triggers rest timer
+- Tap rep cells to complete reps (fill with brush bleed)
+- LOG SET triggers rest → live countdown with brushstroke ring
 - Tap the hero weight to open the drum-roll picker (2.5 kg snap)
 - Push bench past the PR threshold to fire the takeover
-- Mini nav (T / W / PR / ✓) bottom of artboard 01 jumps between screens
+- Mini nav (T / W / PR / ✓) at the bottom of the phone jumps between screens
 
-## Tweaks panel
+## Tweaks panel (top-right)
 
-Language (EN / RU) · Accent (Blood / Caution / Bruise) · Grit · Active state.
+Language EN / RU · Accent (Blood / Caution / Bruise) · Grit · Active state (normal / resting).
 
 ## Files
 
 ```
-BRUTE.html          entry
-ios-frame.jsx       iOS 26 device frame
-design-canvas.jsx   multi-artboard canvas
-tweaks-panel.jsx    runtime controls
+index.html            entry — live app
+ios-frame.jsx         iOS 26 device frame
+tweaks-panel.jsx      runtime controls
 brute/
-  design-tokens.jsx palette, CSS, halftone, brush library
-  i18n.jsx          EN + RU strings
-  flash.jsx         skull, heart, tombstone, medallion, barbell, flame
-  primitives.jsx    buttons, weight drum, rep cells, rest ring
-  session-data.jsx  Week 3 Tuesday Heavy Bench
+  design-tokens.jsx   palette, CSS, halftone, brush library
+  i18n.jsx            EN + RU strings
+  flash.jsx           skull, heart, tombstone, medallion, barbell, flame
+  primitives.jsx      buttons, weight drum, rep cells, rest ring
+  session-data.jsx    Week 3 Tuesday Heavy Bench
   screen-today.jsx
   screen-active.jsx
   screen-pr-complete.jsx
