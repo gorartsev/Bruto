@@ -109,6 +109,76 @@ const BRUTE_CSS = `
 
   @keyframes bruteFade { from { opacity: 0; } to { opacity: 1; } }
   @keyframes bruteSlideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+
+  /* ── Exercise animations — loop the rep ──
+     Target duration ~1.6-2.2s. Pause at top + bottom with cubic-bezier ease. */
+  @keyframes brute-rep-v {  /* vertical up-down: squat, ohp, pullup, dip */
+    0%, 100% { transform: translateY(0); }
+    45%, 55% { transform: translateY(14%); }
+  }
+  @keyframes brute-rep-v-up {  /* bottom-to-top: bench press (bar pushes up) */
+    0%, 100% { transform: translateY(18%); }
+    45%, 55% { transform: translateY(0); }
+  }
+  @keyframes brute-rep-hinge {  /* deadlift / RDL hinge motion */
+    0%, 100% { transform: translateY(10%) scaleY(0.94); transform-origin: 50% 100%; }
+    45%, 55% { transform: translateY(0) scaleY(1); }
+  }
+  @keyframes brute-rep-swing {  /* kettlebell swing arc */
+    0%, 100% { transform: rotate(-24deg); transform-origin: 30% 50%; }
+    50%      { transform: rotate(18deg);  transform-origin: 30% 50%; }
+  }
+  @keyframes brute-rep-pull-x {  /* horizontal pull: row, face pull */
+    0%, 100% { transform: translateX(12%); }
+    45%, 55% { transform: translateX(0); }
+  }
+  @keyframes brute-rep-spread {  /* band pull-apart: hands spread */
+    0%, 100% { transform: scaleX(0.7); }
+    45%, 55% { transform: scaleX(1); }
+  }
+  @keyframes brute-rep-hang {  /* gentle sway for hanging exercises */
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-6%); }
+  }
+  @keyframes brute-rep-push {  /* ring push-up: body goes down + up horizontally */
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(8%); }
+  }
+  @keyframes brute-rep-wheel {  /* bike wheel spin */
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+  }
+  @keyframes brute-rep-walk {  /* subtle bob for carries */
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-3%); }
+  }
+  @keyframes brute-rep-plank {  /* nearly still, tiny tremor */
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-1.5%); }
+  }
+  @keyframes brute-rep-legraise {  /* hanging leg raise */
+    0%, 100% { transform: rotate(0deg); transform-origin: 50% 40%; }
+    45%, 55% { transform: rotate(-70deg); transform-origin: 50% 40%; }
+  }
+
+  [class^="ex-"] { transform-box: fill-box; transform-origin: center; }
+  .ex-move   { animation: brute-rep-v 2s ease-in-out infinite; }
+  .ex-press  { animation: brute-rep-v-up 2s ease-in-out infinite; }
+  .ex-hinge  { animation: brute-rep-hinge 2.2s ease-in-out infinite; }
+  .ex-swing  { animation: brute-rep-swing 1.8s ease-in-out infinite; }
+  .ex-pullx  { animation: brute-rep-pull-x 1.8s ease-in-out infinite; }
+  .ex-spread { animation: brute-rep-spread 2s ease-in-out infinite; }
+  .ex-hang   { animation: brute-rep-hang 2.4s ease-in-out infinite; }
+  .ex-push   { animation: brute-rep-push 1.8s ease-in-out infinite; }
+  .ex-wheel  { animation: brute-rep-wheel 2.2s linear infinite; }
+  .ex-walk   { animation: brute-rep-walk 1.2s ease-in-out infinite; }
+  .ex-plank  { animation: brute-rep-plank 2.6s ease-in-out infinite; }
+  .ex-legraise { animation: brute-rep-legraise 2.2s ease-in-out infinite; }
+
+  /* Respect reduced-motion preference */
+  @media (prefers-reduced-motion: reduce) {
+    [class^="ex-"] { animation: none !important; }
+  }
 `;
 
 Object.assign(window, { BRUTE, BRUSH_PATHS, Brush, halftoneBg, PAPER_NOISE, INK_STROKE, BRUTE_CSS });

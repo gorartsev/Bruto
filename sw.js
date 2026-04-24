@@ -1,5 +1,5 @@
 // BRUTE service worker — offline-first cache
-const VERSION = 'brute-v2-2026-04-24-b';
+const VERSION = 'brute-v3-2026-04-25-a';
 const ASSETS = [
   './',
   './index.html',
@@ -11,6 +11,7 @@ const ASSETS = [
   './ios-frame.jsx',
   './brute/design-tokens.jsx',
   './brute/flash.jsx',
+  './brute/exercise-art.jsx',
   './brute/i18n.jsx',
   './brute/primitives.jsx',
   './brute/program.jsx',

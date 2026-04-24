@@ -289,10 +289,11 @@ function TrainingCard({ today, onStart }) {
             <Brush variant="rule" color={BRUTE.ink} style={{ width: '100%', height: '100%', opacity: 0.7 }}/>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {compact.map((ex, i) => (
-              <div key={i} style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span className="brute-display" style={{ color: BRUTE.ink, fontSize: 18, letterSpacing: '0.03em' }}>
+              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <ExerciseArt exerciseKey={ex.ex} size={36} color={BRUTE.ink}/>
+                <span className="brute-display" style={{ color: BRUTE.ink, fontSize: 18, letterSpacing: '0.03em', flex: 1 }}>
                   {ex.exDef.name}
                 </span>
                 <span className="brute-mono" style={{ color: BRUTE.ink, fontSize: 15, fontWeight: 600 }}>
@@ -496,12 +497,17 @@ function ActiveWorkoutApp({ onExit, onPR, onSessionComplete }) {
       <ScrollArea padding="8px 16px 24px">
         {/* exercise card */}
         <BruteCard tone="bone" padding={18} grit={2}>
-          <div className="brute-caption" style={{ color: BRUTE.bruise }}>
-            УПР. {a.currentIdx + 1} / {a.plannedExercises.length}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 10 }}>
+            <div style={{ flex: 1 }}>
+              <div className="brute-caption" style={{ color: BRUTE.bruise }}>
+                УПР. {a.currentIdx + 1} / {a.plannedExercises.length}
+              </div>
+              <div className="brute-display" style={{
+                fontSize: 34, lineHeight: 0.9, color: BRUTE.ink, marginTop: 6, letterSpacing: '-0.01em',
+              }}>{ex.exDef.name}</div>
+            </div>
+            <ExerciseArt exerciseKey={ex.ex} size={72} color={BRUTE.ink}/>
           </div>
-          <div className="brute-display" style={{
-            fontSize: 36, lineHeight: 0.9, color: BRUTE.ink, marginTop: 6, letterSpacing: '-0.01em',
-          }}>{ex.exDef.name}</div>
 
           {ex.note && (
             <div className="brute-body" style={{ color: BRUTE.smoke, fontSize: 12, marginTop: 4 }}>{ex.note}</div>
@@ -568,13 +574,17 @@ function ActiveWorkoutApp({ onExit, onPR, onSessionComplete }) {
               {nextPreview.map((e, i) => (
                 <div key={i} style={{
                   flex: '0 0 auto', background: BRUTE.smoke,
-                  padding: '10px 14px', borderRadius: 10, minWidth: 120,
+                  padding: '10px 14px', borderRadius: 10, minWidth: 140,
+                  display: 'flex', alignItems: 'center', gap: 10,
                 }}>
-                  <div className="brute-display" style={{ color: BRUTE.paper, fontSize: 14, letterSpacing: '0.02em' }}>
-                    {e.exDef.name}
-                  </div>
-                  <div className="brute-mono" style={{ color: BRUTE.ash, fontSize: 11, marginTop: 2 }}>
-                    {exerciseScheme(e)}
+                  <ExerciseArt exerciseKey={e.ex} size={32} color={BRUTE.paper}/>
+                  <div>
+                    <div className="brute-display" style={{ color: BRUTE.paper, fontSize: 14, letterSpacing: '0.02em' }}>
+                      {e.exDef.name}
+                    </div>
+                    <div className="brute-mono" style={{ color: BRUTE.ash, fontSize: 11, marginTop: 2 }}>
+                      {exerciseScheme(e)}
+                    </div>
                   </div>
                 </div>
               ))}

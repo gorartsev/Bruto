@@ -161,26 +161,33 @@ function LogbookScreen({ onOpenSession }) {
           {filtered.length === 0 && (
             <div style={{ color: BRUTE.ash, padding: '40px 0', textAlign: 'center' }}>Пока пусто.</div>
           )}
-          {filtered.map((s) => (
-            <button key={s.id} onClick={() => onOpenSession(s)}
-              style={{
-                background: BRUTE.smoke, border: 0, borderRadius: 10,
-                padding: '14px 14px', cursor: 'pointer', textAlign: 'left',
-              }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-                <div className="brute-caption" style={{ color: BRUTE.ash }}>{formatShort(s.dateISO)}</div>
-                {(s.prs || []).length > 0 && (
-                  <div className="brute-caption" style={{ color: BRUTE.blood }}>★ {s.prs.length} РЕКОРД{s.prs.length > 1 ? 'А' : ''}</div>
-                )}
-              </div>
-              <div className="brute-display" style={{ fontSize: 20, color: BRUTE.paper, marginTop: 2, letterSpacing: '0.02em' }}>
-                {s.theme}
-              </div>
-              <div className="brute-mono" style={{ color: BRUTE.ash, fontSize: 11, marginTop: 4 }}>
-                {(s.loggedSets || []).length} подходов · {Math.round(s.totalVolumeKg)} кг объём · {Math.round(s.durationSec / 60)} мин
-              </div>
-            </button>
-          ))}
+          {filtered.map((s) => {
+            const mainKey = (s.loggedSets || []).find((ls) => ls.isMain)?.exerciseKey;
+            return (
+              <button key={s.id} onClick={() => onOpenSession(s)}
+                style={{
+                  background: BRUTE.smoke, border: 0, borderRadius: 10,
+                  padding: '14px 14px', cursor: 'pointer', textAlign: 'left',
+                  display: 'flex', alignItems: 'center', gap: 12,
+                }}>
+                {mainKey && <ExerciseArt exerciseKey={mainKey} size={44} color={BRUTE.paper}/>}
+                <div style={{ flex: 1 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                    <div className="brute-caption" style={{ color: BRUTE.ash }}>{formatShort(s.dateISO)}</div>
+                    {(s.prs || []).length > 0 && (
+                      <div className="brute-caption" style={{ color: BRUTE.blood }}>★ {s.prs.length} РЕКОРД{s.prs.length > 1 ? 'А' : ''}</div>
+                    )}
+                  </div>
+                  <div className="brute-display" style={{ fontSize: 20, color: BRUTE.paper, marginTop: 2, letterSpacing: '0.02em' }}>
+                    {s.theme}
+                  </div>
+                  <div className="brute-mono" style={{ color: BRUTE.ash, fontSize: 11, marginTop: 4 }}>
+                    {(s.loggedSets || []).length} подходов · {Math.round(s.totalVolumeKg)} кг · {Math.round(s.durationSec / 60)} мин
+                  </div>
+                </div>
+              </button>
+            );
+          })}
         </div>
       </ScrollArea>
     </PhoneScreen>
@@ -525,6 +532,9 @@ function ExerciseDetail({ exerciseKey, onClose }) {
 
   return (
     <Sheet open={true} onClose={onClose} title={exDef.name} height="85%">
+      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 16 }}>
+        <ExerciseArt exerciseKey={exerciseKey} size={140} color={BRUTE.paper}/>
+      </div>
       <div style={{ display: 'flex', gap: 6, marginBottom: 14 }}>
         {[['form','ТЕХНИКА'], ['history','ИСТОРИЯ'], ['progress','ПРОГРЕСС']].map(([k, l]) => (
           <button key={k} onClick={() => setTab(k)}

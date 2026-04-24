@@ -133,9 +133,10 @@ function ProgramSessionSheet({ coords, onClose, onStart }) {
         {session.exercises.map((ex, i) => (
           <div key={i} style={{
             padding: '10px 12px', background: BRUTE.smoke, borderRadius: 8,
-            display: 'flex', justifyContent: 'space-between', alignItems: 'baseline',
+            display: 'flex', alignItems: 'center', gap: 10,
           }}>
-            <div>
+            <ExerciseArt exerciseKey={ex.ex} size={40} color={BRUTE.paper}/>
+            <div style={{ flex: 1 }}>
               <div className="brute-display" style={{ color: BRUTE.paper, fontSize: 14, letterSpacing: '0.02em' }}>{ex.exDef.name}</div>
               {ex.note && <div className="brute-caption" style={{ color: BRUTE.ash, fontSize: 9, marginTop: 2 }}>{ex.note}</div>}
             </div>
@@ -167,8 +168,11 @@ function LogbookSessionSheet({ session, onClose }) {
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
         {groupByExercise(session.loggedSets || []).map((grp, i) => (
           <div key={i} style={{ background: BRUTE.smoke, borderRadius: 8, padding: '12px 14px' }}>
-            <div className="brute-display" style={{ color: BRUTE.paper, fontSize: 16, letterSpacing: '0.02em' }}>
-              {EXERCISES[grp.key]?.name || grp.key}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <ExerciseArt exerciseKey={grp.key} size={36} color={BRUTE.paper}/>
+              <div className="brute-display" style={{ color: BRUTE.paper, fontSize: 16, letterSpacing: '0.02em' }}>
+                {EXERCISES[grp.key]?.name || grp.key}
+              </div>
             </div>
             <div style={{ marginTop: 6, display: 'flex', flexDirection: 'column', gap: 3 }}>
               {grp.sets.map((ls, si) => (
