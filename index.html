@@ -1,17 +1,14 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
 <meta charset="UTF-8">
-<title>BRUTE — iOS strength journal</title>
+<title>BRUTE</title>
 
-<!-- Viewport: edge-to-edge with safe-area insets for notch / home indicator -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no"/>
 
-<!-- PWA -->
 <link rel="manifest" href="manifest.webmanifest"/>
 <meta name="theme-color" content="#0A0A0A"/>
 
-<!-- iOS standalone -->
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <meta name="apple-mobile-web-app-title" content="BRUTE"/>
@@ -28,32 +25,46 @@
     -webkit-font-smoothing: antialiased;
     -webkit-tap-highlight-color: transparent;
     overscroll-behavior: none;
+    position: fixed; width: 100%; height: 100%;
+    overflow: hidden;
   }
   * { box-sizing: border-box; }
+  input, textarea, button { font-family: inherit; }
 
-  /* Desktop preview stage */
-  .stage-desktop {
-    min-height: 100vh;
-    background: #1a1816;
-    display: flex; align-items: center; justify-content: center;
-    padding: 40px 20px;
-  }
-  .phone-wrap { position: relative; }
-
-  /* Mobile / standalone: fill the viewport, honor safe-area */
+  /* Fullscreen mobile stage */
   .stage-mobile {
     position: fixed; inset: 0;
     background: #0A0A0A;
     overflow: hidden;
   }
-  .stage-mobile .phone-wrap {
-    position: absolute; inset: 0;
-    overflow: hidden;
-  }
 
-  /* Prevent iOS rubber-band scroll at the viewport level */
-  html, body { position: fixed; width: 100%; height: 100%; }
-  body { overflow: hidden; }
+  /* Desktop preview: phone frame inside a centered stage */
+  .stage-desktop {
+    position: fixed; inset: 0;
+    background: #1a1816;
+    display: flex; align-items: center; justify-content: center;
+    padding: 32px 20px;
+    overflow: auto;
+  }
+  .phone-wrap { position: relative; width: 100%; height: 100%; overflow: hidden; }
+
+  /* Splash (shown before React hydrates) */
+  #splash {
+    position: fixed; inset: 0; z-index: 9999;
+    background: #0A0A0A; color: #F4ECD8;
+    display: flex; align-items: center; justify-content: center;
+    flex-direction: column; gap: 18px;
+    pointer-events: none;
+    transition: opacity 400ms ease-out;
+  }
+  #splash.hide { opacity: 0; }
+  #splash .mark {
+    font-family: 'Bebas Neue', 'Impact', sans-serif;
+    font-size: 68px; letter-spacing: 0.02em;
+    background: #B3121A; color: #F4ECD8;
+    padding: 8px 24px 12px; line-height: 1;
+    transform: skewX(-2deg);
+  }
 </style>
 
 <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
@@ -61,185 +72,76 @@
 <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
 
 <script type="text/babel" src="ios-frame.jsx"></script>
-<script type="text/babel" src="tweaks-panel.jsx"></script>
 <script type="text/babel" src="brute/i18n.jsx"></script>
 <script type="text/babel" src="brute/design-tokens.jsx"></script>
 <script type="text/babel" src="brute/flash.jsx"></script>
 <script type="text/babel" src="brute/primitives.jsx"></script>
-<script type="text/babel" src="brute/session-data.jsx"></script>
-<script type="text/babel" src="brute/screen-today.jsx"></script>
-<script type="text/babel" src="brute/screen-active.jsx"></script>
-<script type="text/babel" src="brute/screen-pr-complete.jsx"></script>
+<script type="text/babel" src="brute/program.jsx"></script>
+<script type="text/babel" src="brute/state.jsx"></script>
+<script type="text/babel" src="brute/ui.jsx"></script>
+<script type="text/babel" src="brute/screens-core.jsx"></script>
+<script type="text/babel" src="brute/screens-nav.jsx"></script>
+<script type="text/babel" src="brute/app.jsx"></script>
 </head>
 <body>
+<div id="splash"><div class="mark">BRUTE</div></div>
 <div id="root"></div>
 <script type="text/babel">
 
-// ══════════════════════════════════════════════════════════════
-// BRUTE — live PWA
-// On a phone / standalone: fullscreen, no simulated frame.
-// On desktop: iPhone frame preview + tweaks panel.
-// ══════════════════════════════════════════════════════════════
-
-const TWEAK_DEFAULTS = {
-  accent: "#B3121A",
-  grit: 1,
-  stateCycle: "normal",
-  lang: "ru",
-};
-
-// Detect display mode — standalone (added to home screen) OR narrow viewport
-function useDisplayMode() {
+function Root() {
   const [mode, setMode] = React.useState(() => {
     const standalone = window.matchMedia('(display-mode: standalone)').matches
       || window.navigator.standalone === true;
-    const narrow = window.innerWidth < 500;
+    const narrow = window.innerWidth < 520;
     return (standalone || narrow) ? 'mobile' : 'desktop';
   });
   React.useEffect(() => {
     const onResize = () => {
       const standalone = window.matchMedia('(display-mode: standalone)').matches
         || window.navigator.standalone === true;
-      setMode((standalone || window.innerWidth < 500) ? 'mobile' : 'desktop');
+      setMode((standalone || window.innerWidth < 520) ? 'mobile' : 'desktop');
     };
     window.addEventListener('resize', onResize);
     return () => window.removeEventListener('resize', onResize);
   }, []);
-  return mode;
-}
 
-function LiveFlow({ tweaks, mobile }) {
-  const [screen, setScreen] = React.useState('today');
-  const [pr, setPR] = React.useState(null);
-
-  return (
-    <>
-      {screen === 'today' && (
-        <TodayScreen
-          accent={tweaks.accent}
-          grit={tweaks.grit}
-          lang={tweaks.lang}
-          onStartSession={() => setScreen('active')}
-        />
-      )}
-      {screen === 'active' && (
-        <ActiveWorkoutScreen
-          accent={tweaks.accent}
-          grit={tweaks.grit}
-          lang={tweaks.lang}
-          forceState={tweaks.stateCycle === 'resting' ? 'resting' : 'normal'}
-          onExit={() => setScreen('today')}
-          onPR={(p) => { setPR(p); setScreen('pr'); }}
-          onSessionComplete={() => setScreen('complete')}
-        />
-      )}
-      {screen === 'pr' && pr && (
-        <PRCelebration
-          pr={pr}
-          prev={PREV_PRS.bench}
-          accent={tweaks.accent}
-          lang={tweaks.lang}
-          onDismiss={() => setScreen('active')}
-        />
-      )}
-      {screen === 'complete' && (
-        <SessionComplete
-          accent={tweaks.accent}
-          lang={tweaks.lang}
-          onClose={() => setScreen('today')}
-        />
-      )}
-      {/* dev jump nav — visible only in desktop preview */}
-      {!mobile && (
-        <div style={{
-          position: 'absolute', bottom: 44, left: '50%', transform: 'translateX(-50%)', zIndex: 200,
-          display: 'flex', gap: 4, background: 'rgba(0,0,0,0.8)', padding: 4, borderRadius: 16,
-          border: `1px solid ${BRUTE.smoke}`,
-        }}>
-          {[
-            { id: 'today', label: 'T' },
-            { id: 'active', label: 'W' },
-            { id: 'pr', label: 'PR', setPR: { lift: 'BENCH', weight: 85, reps: 5, new1RM: 99 } },
-            { id: 'complete', label: '✓' },
-          ].map((s) => (
-            <button key={s.id} onClick={() => { if (s.setPR) setPR(s.setPR); setScreen(s.id); }}
-              style={{
-                width: 22, height: 22, borderRadius: '50%', border: 0,
-                background: screen === s.id ? tweaks.accent : BRUTE.smoke,
-                color: BRUTE.paper, fontSize: 9, cursor: 'pointer',
-                fontFamily: "'Bebas Neue', Impact", letterSpacing: '0.04em',
-              }}>{s.label}</button>
-          ))}
-        </div>
-      )}
-    </>
-  );
-}
-
-function App() {
-  const [t, setT] = useTweaks(TWEAK_DEFAULTS);
-  const mode = useDisplayMode();
-  const mobile = mode === 'mobile';
+  React.useEffect(() => {
+    // hide splash once we've mounted
+    const s = document.getElementById('splash');
+    if (s) {
+      setTimeout(() => { s.classList.add('hide'); setTimeout(() => s.remove(), 400); }, 250);
+    }
+  }, []);
 
   return (
-    <>
+    <BruteProvider>
       <style>{BRUTE_CSS}</style>
-
-      {mobile ? (
+      {mode === 'mobile' ? (
         <div className="stage-mobile">
           <div className="phone-wrap">
-            <LiveFlow tweaks={t} mobile={true}/>
+            <BruteApp mobile={true}/>
           </div>
         </div>
       ) : (
         <div className="stage-desktop">
-          <div className="phone-wrap">
-            <IOSDevice width={402} height={874} dark={true}>
-              <LiveFlow tweaks={t} mobile={false}/>
-            </IOSDevice>
-          </div>
+          <IOSDevice width={402} height={874} dark={true}>
+            <div className="phone-wrap" style={{ position: 'relative', width: '100%', height: '100%' }}>
+              <BruteApp mobile={false}/>
+            </div>
+          </IOSDevice>
         </div>
       )}
-
-      {!mobile && (
-        <TweaksPanel title="BRUTE · TWEAKS">
-          <TweakSection label="Language / Язык"/>
-          <TweakRadio label="Language" value={t.lang}
-            options={[
-              { value: 'en', label: 'EN' },
-              { value: 'ru', label: 'RU' },
-            ]}
-            onChange={(v) => setT('lang', v)}/>
-          <TweakSection label="Accent"/>
-          <TweakColor label="Primary" value={t.accent} onChange={(v) => setT('accent', v)}/>
-          <TweakRadio label="Accent preset" value={t.accent}
-            options={[
-              { value: '#B3121A', label: 'Blood' },
-              { value: '#E85C2C', label: 'Caution' },
-              { value: '#7A0C12', label: 'Bruise' },
-            ]}
-            onChange={(v) => setT('accent', v)}/>
-          <TweakSection label="Texture"/>
-          <TweakSlider label="Grit / halftone" value={t.grit} min={0} max={3} step={1}
-            onChange={(v) => setT('grit', v)}/>
-          <TweakSection label="Flow states"/>
-          <TweakRadio label="Active state" value={t.stateCycle}
-            options={['normal', 'resting']}
-            onChange={(v) => setT('stateCycle', v)}/>
-        </TweaksPanel>
-      )}
-    </>
+    </BruteProvider>
   );
 }
 
-// Register service worker (offline support after first load)
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('sw.js').catch((err) => console.warn('SW register failed', err));
   });
 }
 
-ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+ReactDOM.createRoot(document.getElementById('root')).render(<Root/>);
 
 </script>
 </body>

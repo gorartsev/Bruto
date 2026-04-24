@@ -102,6 +102,13 @@ const BRUTE_CSS = `
 
   .brute-press:active { animation: brutePressDown 80ms ease-out; }
   .brute-no-select { user-select: none; -webkit-user-select: none; }
+
+  /* hide scrollbars app-wide (Safari-on-iOS already hides; this is for preview/Chrome) */
+  ::-webkit-scrollbar { width: 0; height: 0; background: transparent; }
+  * { scrollbar-width: none; }
+
+  @keyframes bruteFade { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes bruteSlideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
 `;
 
 Object.assign(window, { BRUTE, BRUSH_PATHS, Brush, halftoneBg, PAPER_NOISE, INK_STROKE, BRUTE_CSS });

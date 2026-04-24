@@ -1,5 +1,5 @@
 // BRUTE service worker — offline-first cache
-const VERSION = 'brute-v1-2026-04-24-a';
+const VERSION = 'brute-v2-2026-04-24-b';
 const ASSETS = [
   './',
   './index.html',
@@ -9,15 +9,16 @@ const ASSETS = [
   './icon-512.png',
   './icon-1024.png',
   './ios-frame.jsx',
-  './tweaks-panel.jsx',
   './brute/design-tokens.jsx',
   './brute/flash.jsx',
   './brute/i18n.jsx',
   './brute/primitives.jsx',
-  './brute/session-data.jsx',
-  './brute/screen-today.jsx',
-  './brute/screen-active.jsx',
-  './brute/screen-pr-complete.jsx',
+  './brute/program.jsx',
+  './brute/state.jsx',
+  './brute/ui.jsx',
+  './brute/screens-core.jsx',
+  './brute/screens-nav.jsx',
+  './brute/app.jsx',
   'https://unpkg.com/react@18.3.1/umd/react.development.js',
   'https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js',
   'https://unpkg.com/@babel/standalone@7.29.0/babel.min.js',
