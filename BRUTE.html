@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>BRUTE — iOS strength journal</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<style>
+  html, body { margin: 0; padding: 0; background: #1a1816; min-height: 100vh; font-family: 'Inter', system-ui, sans-serif; }
+  * { box-sizing: border-box; }
+</style>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel" src="ios-frame.jsx"></script>
+<script type="text/babel" src="design-canvas.jsx"></script>
+<script type="text/babel" src="tweaks-panel.jsx"></script>
+<script type="text/babel" src="brute/i18n.jsx"></script>
+<script type="text/babel" src="brute/design-tokens.jsx"></script>
+<script type="text/babel" src="brute/flash.jsx"></script>
+<script type="text/babel" src="brute/primitives.jsx"></script>
+<script type="text/babel" src="brute/session-data.jsx"></script>
+<script type="text/babel" src="brute/screen-today.jsx"></script>
+<script type="text/babel" src="brute/screen-active.jsx"></script>
+<script type="text/babel" src="brute/screen-pr-complete.jsx"></script>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+
+// ══════════════════════════════════════════════════════════════
+// BRUTE — prototype index
+// Design canvas showing all four screens in iPhone frames side by side.
+// Plus one live, interactive flow in the first artboard.
+// ══════════════════════════════════════════════════════════════
+
+const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+  "accent": "#B3121A",
+  "grit": 1,
+  "brushHeavy": true,
+  "stateCycle": "normal",
+  "phase": 1,
+  "theme": "ink",
+  "lang": "ru"
+}/*EDITMODE-END*/;
+
+function PhoneShell({ children, label, labelScreen }) {
+  return (
+    <div data-screen-label={labelScreen || label}
+         style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
+      <IOSDevice width={402} height={874} dark={true}>
+        {children}
+      </IOSDevice>
+      <div style={{
+        fontFamily: "'Bebas Neue', Impact, sans-serif", fontSize: 20,
+        color: BRUTE.bone, letterSpacing: '0.08em',
+      }}>{label}</div>
+    </div>
+  );
+}
+
+function LiveFlow({ tweaks }) {
+  // screen: 'today' | 'active' | 'pr' | 'complete'
+  const [screen, setScreen] = React.useState('today');
+  const [pr, setPR] = React.useState(null);
+
+  return (
+    <>
+      {screen === 'today' && (
+        <TodayScreen
+          accent={tweaks.accent}
+          grit={tweaks.grit}
+          lang={tweaks.lang}
+          onStartSession={() => setScreen('active')}
+        />
+      )}
+      {screen === 'active' && (
+        <ActiveWorkoutScreen
+          accent={tweaks.accent}
+          grit={tweaks.grit}
+          lang={tweaks.lang}
+          forceState={tweaks.stateCycle === 'resting' ? 'resting' : 'normal'}
+          onExit={() => setScreen('today')}
+          onPR={(p) => { setPR(p); setScreen('pr'); }}
+          onSessionComplete={() => setScreen('complete')}
+        />
+      )}
+      {screen === 'pr' && pr && (
+        <PRCelebration
+          pr={pr}
+          prev={PREV_PRS.bench}
+          accent={tweaks.accent}
+          lang={tweaks.lang}
+          onDismiss={() => setScreen('active')}
+        />
+      )}
+      {screen === 'complete' && (
+        <SessionComplete
+          accent={tweaks.accent}
+          lang={tweaks.lang}
+          onClose={() => setScreen('today')}
+        />
+      )}
+      {/* tiny mini-controls for jumping directly */}
+      <div style={{
+        position: 'absolute', bottom: 44, left: '50%', transform: 'translateX(-50%)', zIndex: 200,
+        display: 'flex', gap: 4, background: 'rgba(0,0,0,0.8)', padding: 4, borderRadius: 16,
+        border: `1px solid ${BRUTE.smoke}`,
+      }}>
+        {[
+          { id: 'today', label: 'T' },
+          { id: 'active', label: 'W' },
+          { id: 'pr', label: 'PR', setPR: { lift: 'BENCH', weight: 85, reps: 5, new1RM: 99 } },
+          { id: 'complete', label: '✓' },
+        ].map((s) => (
+          <button key={s.id} onClick={() => { if (s.setPR) setPR(s.setPR); setScreen(s.id); }}
+            style={{
+              width: 22, height: 22, borderRadius: '50%', border: 0,
+              background: screen === s.id ? tweaks.accent : BRUTE.smoke,
+              color: BRUTE.paper, fontSize: 9, cursor: 'pointer',
+              fontFamily: "'Bebas Neue', Impact", letterSpacing: '0.04em',
+            }}>{s.label}</button>
+        ))}
+      </div>
+    </>
+  );
+}
+
+// ─── Static preview renderers for canvas artboards ──────────────────────────
+
+function PreviewToday({ tweaks }) {
+  return <TodayScreen accent={tweaks.accent} grit={tweaks.grit} lang={tweaks.lang} onStartSession={() => {}}/>;
+}
+function PreviewActive({ tweaks }) {
+  return <ActiveWorkoutScreen accent={tweaks.accent} grit={tweaks.grit} lang={tweaks.lang}
+    forceState="resting" onExit={() => {}} onPR={() => {}} onSessionComplete={() => {}}/>;
+}
+function PreviewPR({ tweaks }) {
+  return <>
+    <ActiveWorkoutScreen accent={tweaks.accent} grit={tweaks.grit} lang={tweaks.lang}
+      onExit={() => {}} onPR={() => {}} onSessionComplete={() => {}}/>
+    <PRCelebration
+      pr={{ lift: 'BENCH', weight: 85, reps: 5, new1RM: 99 }}
+      prev={PREV_PRS.bench}
+      accent={tweaks.accent}
+      lang={tweaks.lang}
+      onDismiss={() => {}}
+    />
+  </>;
+}
+function PreviewComplete({ tweaks }) {
+  return <>
+    <div style={{ position: 'absolute', inset: 0, background: BRUTE.ink }}/>
+    <SessionComplete accent={tweaks.accent} lang={tweaks.lang} onClose={() => {}}/>
+  </>;
+}
+
+// ─── Root ───────────────────────────────────────────────────────────────────
+
+function App() {
+  const [t, setT] = useTweaks(TWEAK_DEFAULTS);
+
+  return (
+    <>
+      <style>{BRUTE_CSS}</style>
+      <DesignCanvas title="BRUTE" subtitle="iOS strength journal · punk tattoo-zine · week 03, heavy bench">
+
+        <DCSection id="core" title="Core Loop">
+          <DCArtboard id="live" label="01 · Live Prototype" width={402} height={874}>
+            <LiveFlow tweaks={t}/>
+          </DCArtboard>
+
+          <DCArtboard id="today" label="02 · Today" width={402} height={874}>
+            <IOSDevice width={402} height={874} dark={true}>
+              <PreviewToday tweaks={t}/>
+            </IOSDevice>
+          </DCArtboard>
+
+          <DCArtboard id="active" label="03 · Active Workout · Resting" width={402} height={874}>
+            <IOSDevice width={402} height={874} dark={true}>
+              <PreviewActive tweaks={t}/>
+            </IOSDevice>
+          </DCArtboard>
+
+          <DCArtboard id="pr" label="04 · PR Celebration" width={402} height={874}>
+            <IOSDevice width={402} height={874} dark={true}>
+              <PreviewPR tweaks={t}/>
+            </IOSDevice>
+          </DCArtboard>
+
+          <DCArtboard id="complete" label="05 · Session Complete" width={402} height={874}>
+            <IOSDevice width={402} height={874} dark={true}>
+              <PreviewComplete tweaks={t}/>
+            </IOSDevice>
+          </DCArtboard>
+        </DCSection>
+
+        <DCSection id="system" title="Design System Sample">
+          <DCArtboard id="system-swatches" label="Palette · Type · Brush" width={720} height={560}>
+            <SystemSheet accent={t.accent}/>
+          </DCArtboard>
+        </DCSection>
+
+      </DesignCanvas>
+
+      <TweaksPanel title="BRUTE · TWEAKS">
+        <TweakSection label="Language / Язык"/>
+        <TweakRadio label="Language" value={t.lang}
+          options={[
+            { value: 'en', label: 'EN' },
+            { value: 'ru', label: 'RU' },
+          ]}
+          onChange={(v) => setT('lang', v)}/>
+        <TweakSection label="Accent"/>
+        <TweakColor label="Primary" value={t.accent} onChange={(v) => setT('accent', v)}/>
+        <TweakRadio label="Accent preset" value={t.accent}
+          options={[
+            { value: '#B3121A', label: 'Blood' },
+            { value: '#E85C2C', label: 'Caution' },
+            { value: '#7A0C12', label: 'Bruise' },
+          ]}
+          onChange={(v) => setT('accent', v)}/>
+        <TweakSection label="Texture"/>
+        <TweakSlider label="Grit / halftone" value={t.grit} min={0} max={3} step={1}
+          onChange={(v) => setT('grit', v)}/>
+        <TweakSection label="Flow states"/>
+        <TweakRadio label="Active state" value={t.stateCycle}
+          options={['normal', 'resting']}
+          onChange={(v) => setT('stateCycle', v)}/>
+      </TweaksPanel>
+    </>
+  );
+}
+
+// Small design-system sheet so the canvas documents the choices
+function SystemSheet({ accent }) {
+  return (
+    <div style={{ width: '100%', height: '100%', background: BRUTE.ink, color: BRUTE.paper, padding: 28, position: 'relative', overflow: 'hidden' }}>
+      <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', backgroundImage: halftoneBg('#fff', 1), opacity: 0.2 }}/>
+      <div style={{ position: 'relative' }}>
+        <div className="brute-display" style={{ fontSize: 72, letterSpacing: '-0.02em', lineHeight: 0.9 }}>BRUTE.</div>
+        <div className="brute-caption" style={{ color: BRUTE.ash, marginTop: 4 }}>DESIGN SYSTEM · V0.1</div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 28, marginTop: 28 }}>
+          {/* palette */}
+          <div>
+            <div className="brute-caption" style={{ color: BRUTE.ash }}>PALETTE</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 10 }}>
+              {[
+                ['INK', BRUTE.ink, '#0A0A0A'],
+                ['BONE', BRUTE.bone, '#F4ECD8'],
+                ['BLOOD', accent, accent.toUpperCase()],
+                ['SMOKE', BRUTE.smoke, '#2A2A2A'],
+                ['ASH', BRUTE.ash, '#6B6B6B'],
+                ['BRUISE', BRUTE.bruise, '#4A1518'],
+              ].map(([name, c, hex]) => (
+                <div key={name} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <div style={{ width: 28, height: 28, background: c, borderRadius: 4, border: `1px solid ${BRUTE.smoke}` }}/>
+                  <span className="brute-display" style={{ fontSize: 18, width: 70, letterSpacing: '0.04em' }}>{name}</span>
+                  <span className="brute-mono" style={{ fontSize: 11, color: BRUTE.ash }}>{hex}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+          {/* type */}
+          <div>
+            <div className="brute-caption" style={{ color: BRUTE.ash }}>TYPE</div>
+            <div style={{ marginTop: 10 }}>
+              <div className="brute-display" style={{ fontSize: 42, lineHeight: 0.95 }}>BEBAS NEUE</div>
+              <div className="brute-caption" style={{ color: BRUTE.ash }}>DISPLAY / HEADERS</div>
+            </div>
+            <div style={{ marginTop: 14 }}>
+              <div className="brute-body" style={{ fontSize: 16 }}>Inter — body & UI copy. Neutral, quiet, carries information without shouting.</div>
+              <div className="brute-caption" style={{ color: BRUTE.ash, marginTop: 4 }}>BODY</div>
+            </div>
+            <div style={{ marginTop: 14 }}>
+              <div className="brute-mono" style={{ fontSize: 28, fontWeight: 700 }}>82.5 × 5</div>
+              <div className="brute-caption" style={{ color: BRUTE.ash }}>JETBRAINS MONO · TABULAR</div>
+            </div>
+          </div>
+        </div>
+
+        {/* brushes */}
+        <div style={{ marginTop: 28 }}>
+          <div className="brute-caption" style={{ color: BRUTE.ash }}>BRUSH LIBRARY</div>
+          <div style={{ display: 'flex', gap: 12, marginTop: 10, alignItems: 'center' }}>
+            <div style={{ width: 120, height: 40 }}><Brush variant="slab" color={accent}/></div>
+            <div style={{ width: 100, height: 30 }}><Brush variant="dash" color={accent}/></div>
+            <div style={{ width: 80, height: 60 }}><Brush variant="splat" color={accent}/></div>
+            <div style={{ width: 120, height: 12 }}><Brush variant="rule" color={BRUTE.bone}/></div>
+            <FlashFlame size={32} color={accent}/>
+            <FlashBarbell size={36} color={BRUTE.bone}/>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+
+</script>
+</body>
+</html>
