@@ -134,25 +134,26 @@ function LogbookScreen({ onOpenSession }) {
       <ScrollArea padding="12px 16px 110px">
         <div className="brute-display" style={{ fontSize: 36, color: BRUTE.text, letterSpacing: '-0.01em' }}>ЖУРНАЛ</div>
         <div className="brute-caption" style={{ color: BRUTE.textFaint, marginTop: 2 }}>
-          {list.length} ТРЕНИРОВОК В ИСТОРИИ
+          {list.length} {pl(list.length, 'ТРЕНИРОВКА', 'ТРЕНИРОВКИ', 'ТРЕНИРОВОК')} В ИСТОРИИ
         </div>
 
-        <div style={{ marginTop: 14, display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 4 }}>
+        <div style={{ marginTop: 14, display: 'flex', gap: 6, overflowX: 'auto', overflowY: 'hidden', paddingBottom: 4, WebkitOverflowScrolling: 'touch' }}>
           {[
             { k: 'all',       l: 'ВСЕ' },
             { k: 'prs',       l: 'РЕКОРДЫ' },
             { k: 'squat',     l: 'ПРИСЕД' },
             { k: 'bench',     l: 'ЖИМ' },
-            { k: 'deadlift',  l: 'СТАНОВАЯ' },
-            { k: 'ohp',       l: 'ЖИМ СТОЯ' },
+            { k: 'deadlift',  l: 'ТЯГА' },
+            { k: 'ohp',       l: 'ОВЕРХЕД' },
           ].map((c) => (
             <button key={c.k} onClick={() => setFilter(c.k)}
               style={{
-                flex: '0 0 auto',
-                padding: '6px 12px', borderRadius: 6, cursor: 'pointer',
+                flex: '0 0 auto', whiteSpace: 'nowrap',
+                padding: '6px 10px', borderRadius: 6, cursor: 'pointer',
                 background: filter === c.k ? BRUTE.blood : 'transparent',
                 border: `1px solid ${filter === c.k ? BRUTE.blood : BRUTE.border}`,
-                color: BRUTE.text, fontFamily: "'Bebas Neue', Impact", fontSize: 14, letterSpacing: '0.04em',
+                color: filter === c.k ? BRUTE.surface : BRUTE.text,
+                fontFamily: "'Bebas Neue', Impact", fontSize: 13, letterSpacing: '0.04em',
               }}>{c.l}</button>
           ))}
         </div>
@@ -175,14 +176,14 @@ function LogbookScreen({ onOpenSession }) {
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
                     <div className="brute-caption" style={{ color: BRUTE.textFaint }}>{formatShort(s.dateISO)}</div>
                     {(s.prs || []).length > 0 && (
-                      <div className="brute-caption" style={{ color: BRUTE.blood }}>★ {s.prs.length} РЕКОРД{s.prs.length > 1 ? 'А' : ''}</div>
+                      <div className="brute-caption" style={{ color: BRUTE.blood }}>★ {s.prs.length} {pl(s.prs.length, 'РЕКОРД', 'РЕКОРДА', 'РЕКОРДОВ')}</div>
                     )}
                   </div>
                   <div className="brute-display" style={{ fontSize: 20, color: BRUTE.text, marginTop: 2, letterSpacing: '0.02em' }}>
                     {s.theme}
                   </div>
                   <div className="brute-mono" style={{ color: BRUTE.textFaint, fontSize: 11, marginTop: 4 }}>
-                    {(s.loggedSets || []).length} подходов · {Math.round(s.totalVolumeKg)} кг · {Math.round(s.durationSec / 60)} мин
+                    {(s.loggedSets || []).length} {pl((s.loggedSets || []).length, 'подход', 'подхода', 'подходов')} · {Math.round(s.totalVolumeKg)} кг · {Math.round(s.durationSec / 60)} мин
                   </div>
                 </div>
               </button>
@@ -645,7 +646,7 @@ function ProgressChart({ sets }) {
         <path d={d} fill="none" stroke={BRUTE.blood} strokeWidth="2" strokeLinejoin="round"/>
       </svg>
       <div className="brute-caption" style={{ color: BRUTE.textFaint, marginTop: 8 }}>
-        РМ · {Math.round(min)} → {Math.round(max)} КГ · {vals.length} ТОЧЕК
+        РМ · {Math.round(min)} → {Math.round(max)} КГ · {vals.length} {pl(vals.length, 'ТОЧКА', 'ТОЧКИ', 'ТОЧЕК')}
       </div>
     </div>
   );

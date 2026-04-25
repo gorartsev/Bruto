@@ -261,13 +261,13 @@ function WeeklyReviewCard({ weekStartISO, sessions, moodLog, relapseDates, clean
           <Stat label="ТРЕНИРОВОК" value={String(weekSessions.length)} sub={`${sets} ПОДХОДОВ`}/>
           <Stat label="ОБЪЁМ" value={`${Math.round(totalVolume)}`} sub="КГ"/>
           <Stat label="ЧИСТЫХ" value={cleanSinceISO ? `${cleanCount} / 7` : '—'} sub="ДНЕЙ"/>
-          <Stat label="НАСТРОЕНИЕ" value={moodAvg > 0 ? moodAvg.toFixed(1) : '—'} sub={`${weekMoods.length} ОТМЕТОК`}/>
+          <Stat label="НАСТРОЕНИЕ" value={moodAvg > 0 ? moodAvg.toFixed(1) : '—'} sub={`${weekMoods.length} ${pl(weekMoods.length, 'ОТМЕТКА', 'ОТМЕТКИ', 'ОТМЕТОК')}`}/>
         </div>
 
         {prsThisWeek > 0 && (
           <div style={{ marginTop: 12, padding: '8px 12px', background: BRUTE.blood, borderRadius: 6 }}>
             <span className="brute-display" style={{ color: BRUTE.surface, fontSize: 16, letterSpacing: '0.04em' }}>
-              ★ {prsThisWeek} {prsThisWeek === 1 ? 'РЕКОРД' : 'РЕКОРДА'} ЗА НЕДЕЛЮ
+              ★ {prsThisWeek} {pl(prsThisWeek, 'РЕКОРД', 'РЕКОРДА', 'РЕКОРДОВ')} ЗА НЕДЕЛЮ
             </span>
           </div>
         )}

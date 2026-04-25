@@ -485,15 +485,18 @@ function dayStatus(dateISO, cleanSinceISO, todayISO, relapseDates = []) {
 }
 
 // Longest clean streak ever recorded.
+// Counts whole days FROM cleanSinceISO (exclusive start) TO today (inclusive).
+// Matches daysClean semantics: a 31-day-old start with no relapse → 31.
 function longestStreak(cleanSinceISO, todayISO, relapseDates = []) {
   if (!cleanSinceISO) return 0;
   const start = isoToDate(cleanSinceISO);
   const today = isoToDate(todayISO);
   const dayMs = 86400000;
   const total = Math.round((today - start) / dayMs);
-  if (total < 0) return 0;
+  if (total <= 0) return 0;
   let best = 0, cur = 0;
-  for (let i = 0; i <= total; i++) {
+  // i=1..total — count days AFTER start day (start day itself isn't a streak day yet)
+  for (let i = 1; i <= total; i++) {
     const d = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i);
     const iso = dateToISO(d);
     if ((relapseDates || []).includes(iso)) {
@@ -571,6 +574,15 @@ function lastSundayISO(todayISO) {
 }
 
 // Get the Monday of the week we just finished (last week's Mon → Sun cycle).
+// Russian plural: pl(n, 'подход', 'подхода', 'подходов')
+function pl(n, one, few, many) {
+  const m10 = n % 10, m100 = n % 100;
+  if (m100 >= 11 && m100 <= 14) return many;
+  if (m10 === 1) return one;
+  if (m10 >= 2 && m10 <= 4) return few;
+  return many;
+}
+
 function lastWeekStartISO(todayISO) {
   const d = isoToDate(todayISO);
   const dow = d.getDay();   // 0=Sun..6=Sat
@@ -587,5 +599,5 @@ Object.assign(window, {
   computeStreak, sessionsByWeek, bestOneRMs,
   daysClean, todayMood, moodAverage, dayStatus, longestStreak,
   moneySaved, unlockedLetters, TOMBSTONE_MILESTONES, tombstonesEarned,
-  STRENGTH_STANDARDS, strengthLevel, lastSundayISO, lastWeekStartISO,
+  STRENGTH_STANDARDS, strengthLevel, lastSundayISO, lastWeekStartISO, pl,
 });

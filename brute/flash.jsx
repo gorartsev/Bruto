@@ -57,10 +57,10 @@ function FlashTombstone({ size = 160, color = '#0A0A0A', liftLabel = 'BENCH', to
       {/* cross */}
       <path d="M80,38 L80,54 M72,46 L88,46" {...S} strokeWidth="2"/>
       {/* text bands */}
-      <text x="80" y="82" textAnchor="middle" fontFamily="'Bebas Neue', Impact, sans-serif" fontSize="18" fill={color} letterSpacing="1">{topText}</text>
+      <text x="80" y="82" textAnchor="middle" fontFamily="'Bebas Neue', Impact, sans-serif" fontSize="16" fill={color} letterSpacing="0.8" lengthAdjust="spacingAndGlyphs" textLength={topText.length > 10 ? 70 : undefined}>{topText}</text>
       <path d="M52,94 L108,94" {...S} strokeWidth="1.2"/>
       <text x="80" y="114" textAnchor="middle" fontFamily="'Bebas Neue', Impact, sans-serif" fontSize="20" fontWeight="700" fill={color} letterSpacing="1.5">{liftLabel}</text>
-      <text x="80" y="130" textAnchor="middle" fontFamily="'Inter', sans-serif" fontSize="8" fill={color} letterSpacing="2">{subText}</text>
+      <text x="80" y="130" textAnchor="middle" fontFamily="'Inter', sans-serif" fontSize="7" fill={color} letterSpacing="0.8" lengthAdjust="spacingAndGlyphs" textLength={subText && subText.length > 8 ? 70 : undefined}>{subText}</text>
       {/* crosshatch shading left side */}
       <path d="M46,80 L52,86 M46,90 L52,96 M46,100 L52,106 M46,110 L52,116" {...S} strokeWidth="1" opacity="0.5"/>
     </svg>

@@ -3,11 +3,18 @@
 function BruteApp({ mobile = true }) {
   const { state, actions } = useBrute();
   const { profile, activeSession } = state;
-  const [tab, setTab] = React.useState('today');
+  const [tab, _setTab] = React.useState('today');
   const [prOverlay, setPrOverlay] = React.useState(null);
   const [sessionCompleteOverlay, setSessionCompleteOverlay] = React.useState(null);
-  const [programSheetSession, setProgramSheetSession] = React.useState(null); // { week, weekday, phase }
-  const [logbookSheetSession, setLogbookSheetSession] = React.useState(null); // LoggedSession
+  const [programSheetSession, setProgramSheetSession] = React.useState(null);
+  const [logbookSheetSession, setLogbookSheetSession] = React.useState(null);
+
+  // Wrap tab setter to clear lingering sheets on navigation
+  const setTab = (t) => {
+    setProgramSheetSession(null);
+    setLogbookSheetSession(null);
+    _setTab(t);
+  };
 
   // Onboarding gate
   if (!profile.onboarded) {

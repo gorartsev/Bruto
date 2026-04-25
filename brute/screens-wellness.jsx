@@ -228,7 +228,7 @@ function CleanDaysScreen() {
                   fontWeight: 700, letterSpacing: '-0.04em', marginTop: 8,
                 }}>{days}</div>
                 <div className="brute-caption" style={{ color: BRUTE.textFaint, marginTop: 6 }}>
-                  СТАРТ {formatShort(profile.cleanSinceISO)} · РЕКОРД {longest} ДН. · СБРОСОВ {totalRelapses}
+                  СТАРТ {formatShort(profile.cleanSinceISO)} · РЕКОРД {longest} ДН. · {totalRelapses} {pl(totalRelapses, 'СБРОС', 'СБРОСА', 'СБРОСОВ')}
                 </div>
                 <div style={{ marginTop: 14 }}><CleanMilestone days={days}/></div>
                 <div style={{ marginTop: 14, display: 'flex', gap: 8 }}>
@@ -281,7 +281,7 @@ function CleanDaysScreen() {
             </BrushButton>
             {todayUrges > 0 && (
               <div className="brute-caption" style={{ color: BRUTE.textFaint, marginTop: 6, textAlign: 'center' }}>
-                СЕГОДНЯ ЖАЛ {todayUrges} {todayUrges === 1 ? 'РАЗ' : 'РАЗА'} · ВЫСТОЯЛ
+                СЕГОДНЯ ЖАЛ {todayUrges} {pl(todayUrges, 'РАЗ', 'РАЗА', 'РАЗ')} · ВЫСТОЯЛ
               </div>
             )}
           </div>
@@ -411,7 +411,7 @@ function CleanDaysScreen() {
             <BruteCard tone="bone" padding={18} grit={1}>
               <div className="brute-caption" style={{ color: BRUTE.bruise }}>КЛАДБИЩЕ СТАРОГО ТЕБЯ</div>
               <div className="brute-caption" style={{ color: BRUTE.textFaint, marginTop: 4, fontSize: 9 }}>
-                {earned.length} / {TOMBSTONE_MILESTONES.length} ВЕХ ЗАКРЫТО
+                {earned.length} / {TOMBSTONE_MILESTONES.length} {pl(earned.length, 'ВЕХА', 'ВЕХИ', 'ВЕХ')} ЗАКРЫТО
               </div>
               <div style={{ marginTop: 12, display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
                 {TOMBSTONE_MILESTONES.map((m) => {
@@ -977,7 +977,7 @@ function TombstoneSheet({ days, earnedDate, onClose }) {
         <FlashTombstone size={200} color={BRUTE.text}
           liftLabel={`${days} ДНЕЙ`}
           topText="ЗДЕСЬ ЛЕЖИТ"
-          subText={earnedDate ? `СТАРТ ${formatShort(earnedDate).slice(5).toUpperCase()}` : ''}/>
+          subText={earnedDate ? formatShort(earnedDate).slice(5).toUpperCase() : ''}/>
       </div>
       <div className="brute-display" style={{ fontSize: 24, color: BRUTE.text, lineHeight: 1.1, textAlign: 'center', marginTop: 8 }}>
         ТО ЧТО БЫЛО — НЕ ВЕРНЁТСЯ.
