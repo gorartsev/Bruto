@@ -24,7 +24,8 @@ const INITIAL_STATE = {
   prs: [],            // PRRecord[]
   bodyweight: [],     // BodyweightEntry[]
   moodLog: [],        // [{ dateISO, score: 1..5, note: '' }]
-  cleanRelapses: [],  // [{ dateISO, prevSinceISO }] — history of resets
+  relapseDates: [],   // [dateISO] — explicit list of days marked as relapse (sorted)
+  cleanRelapses: [],  // [{ dateISO, prevSinceISO }] — legacy reset history (kept for compat)
   activeSession: null, // { templateKey, startedAt, currentIdx, currentSetIdx, loggedSets[], restStartedAt, restDurationSec }
 };
 
@@ -40,6 +41,10 @@ function loadState() {
     parsed.bodyweight = parsed.bodyweight || [];
     parsed.moodLog = parsed.moodLog || [];
     parsed.cleanRelapses = parsed.cleanRelapses || [];
+    // migrate legacy cleanRelapses → relapseDates if not yet set
+    if (!parsed.relapseDates) {
+      parsed.relapseDates = (parsed.cleanRelapses || []).map((r) => r.dateISO);
+    }
     parsed.activeSession = parsed.activeSession || null;
     return parsed;
   } catch (e) {
@@ -246,14 +251,28 @@ function BruteProvider({ children }) {
     },
 
     relapse() {
+      // shorthand for "I relapsed today"
       setState((s) => {
         const todayISO = dateToISO(new Date());
         const prev = s.profile.cleanSinceISO;
+        const list = (s.relapseDates || []).slice();
+        if (!list.includes(todayISO)) list.push(todayISO);
+        list.sort();
         return {
           ...s,
-          profile: { ...s.profile, cleanSinceISO: todayISO },
+          relapseDates: list,
           cleanRelapses: [...(s.cleanRelapses || []), { dateISO: todayISO, prevSinceISO: prev }],
         };
+      });
+    },
+
+    toggleRelapse(dateISO) {
+      setState((s) => {
+        const list = (s.relapseDates || []).slice();
+        const idx = list.indexOf(dateISO);
+        if (idx >= 0) list.splice(idx, 1);
+        else { list.push(dateISO); list.sort(); }
+        return { ...s, relapseDates: list };
       });
     },
 
@@ -264,6 +283,16 @@ function BruteProvider({ children }) {
         return {
           ...s,
           moodLog: [...existing, { dateISO: todayISO, score, note, timestamp: Date.now() }],
+        };
+      });
+    },
+
+    logMoodFor(dateISO, score, note = '') {
+      setState((s) => {
+        const existing = (s.moodLog || []).filter((m) => m.dateISO !== dateISO);
+        return {
+          ...s,
+          moodLog: [...existing, { dateISO, score, note, timestamp: Date.now() }],
         };
       });
     },
@@ -340,9 +369,50 @@ function bestOneRMs(prs, profile) {
 }
 
 // ── Sobriety helpers ──
-function daysClean(cleanSinceISO, todayISO) {
+// daysClean returns the current streak: days since the last relapse on or before today.
+// If no relapse yet, returns days since cleanSinceISO.
+function daysClean(cleanSinceISO, todayISO, relapseDates = []) {
   if (!cleanSinceISO) return 0;
+  // Find most recent relapse ≤ today
+  const past = (relapseDates || []).filter((d) => d <= todayISO).sort();
+  const lastRelapse = past.length > 0 ? past[past.length - 1] : null;
+  if (lastRelapse) {
+    if (lastRelapse === todayISO) return 0;
+    return Math.max(0, daysBetween(lastRelapse, todayISO));
+  }
   return Math.max(0, daysBetween(cleanSinceISO, todayISO));
+}
+
+// Status of a day: 'before' | 'relapse' | 'clean' | 'future' | 'today-clean' | 'today-relapse'
+function dayStatus(dateISO, cleanSinceISO, todayISO, relapseDates = []) {
+  if (!cleanSinceISO) return 'before';
+  if (dateISO < cleanSinceISO) return 'before';
+  if (dateISO > todayISO) return 'future';
+  const isRelapse = (relapseDates || []).includes(dateISO);
+  if (dateISO === todayISO) return isRelapse ? 'today-relapse' : 'today-clean';
+  return isRelapse ? 'relapse' : 'clean';
+}
+
+// Longest clean streak ever recorded.
+function longestStreak(cleanSinceISO, todayISO, relapseDates = []) {
+  if (!cleanSinceISO) return 0;
+  const start = isoToDate(cleanSinceISO);
+  const today = isoToDate(todayISO);
+  const dayMs = 86400000;
+  const total = Math.round((today - start) / dayMs);
+  if (total < 0) return 0;
+  let best = 0, cur = 0;
+  for (let i = 0; i <= total; i++) {
+    const d = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i);
+    const iso = dateToISO(d);
+    if ((relapseDates || []).includes(iso)) {
+      if (cur > best) best = cur;
+      cur = 0;
+    } else {
+      cur++;
+    }
+  }
+  return Math.max(best, cur);
 }
 
 function todayMood(moodLog, todayISO) {
@@ -363,5 +433,5 @@ Object.assign(window, {
   BRUTE_STORE_KEY, INITIAL_STATE,
   loadState, saveState, BruteCtx, BruteProvider, useBrute,
   computeStreak, sessionsByWeek, bestOneRMs,
-  daysClean, todayMood, moodAverage,
+  daysClean, todayMood, moodAverage, dayStatus, longestStreak,
 });
