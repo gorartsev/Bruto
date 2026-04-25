@@ -255,18 +255,18 @@ function CleanDaysScreen() {
           </BruteCard>
         </div>
 
-        {/* MONEY SAVED — only if dailyCostRub set */}
-        {profile.cleanSinceISO && profile.dailyCostRub > 0 && (
+        {/* MONEY SAVED — only if dailyCostUsd set */}
+        {profile.cleanSinceISO && profile.dailyCostUsd > 0 && (
           <div style={{ marginTop: 12 }}>
             <BruteCard tone="bone" padding={18} grit={1}>
               <div className="brute-caption" style={{ color: BRUTE.bruise }}>ДЕНЕГ НЕ СПУЩЕНО</div>
               <div className="brute-mono" style={{
                 fontSize: 36, color: BRUTE.text, fontWeight: 700, marginTop: 4, letterSpacing: '-0.02em',
               }}>
-                {saved.toLocaleString('ru-RU')}<span style={{ color: BRUTE.textFaint, fontSize: 16, marginLeft: 6 }}>₽</span>
+                $ {saved.toLocaleString('en-US')}
               </div>
               <div className="brute-caption" style={{ color: BRUTE.textFaint, marginTop: 4 }}>
-                {days} ДН × {profile.dailyCostRub} ₽ В ДЕНЬ
+                {days} ДН × ${profile.dailyCostUsd} В ДЕНЬ
               </div>
             </BruteCard>
           </div>
@@ -502,7 +502,7 @@ function CleanDaysScreen() {
         )}
       </Sheet>
 
-      <CostSheet open={showCostSheet} onClose={() => setShowCostSheet(false)} value={profile.dailyCostRub} onSave={(v) => actions.setDailyCost(v)}/>
+      <CostSheet open={showCostSheet} onClose={() => setShowCostSheet(false)} value={profile.dailyCostUsd} onSave={(v) => actions.setDailyCost(v)}/>
       <ReasonsEditorSheet open={showReasonsSheet} onClose={() => setShowReasonsSheet(false)} reasons={profile.cleanReasons || []} onSave={(arr) => actions.setCleanReasons(arr)}/>
       <UrgeSheet open={showUrgeSheet} onClose={() => setShowUrgeSheet(false)} reasons={profile.cleanReasons || []} actions={actions}/>
       <LetterWriterSheet open={showLetterWriter} onClose={() => setShowLetterWriter(false)} actions={actions} currentDays={days}/>
@@ -674,8 +674,8 @@ function CostSheet({ open, onClose, value, onSave }) {
   if (!open) return null;
   return (
     <Sheet open={true} onClose={onClose} title="СКОЛЬКО ОБЫЧНО ТРАТИЛ В ДЕНЬ?" height="55%">
-      <div className="brute-caption" style={{ color: BRUTE.textFaint, marginBottom: 8 }}>СТОИМОСТЬ ОДНОГО ДНЯ В РУБЛЯХ</div>
-      <Stepper value={v} onChange={setV} min={0} max={20000} step={50} unit="₽" big onHaptic={hapticLight}/>
+      <div className="brute-caption" style={{ color: BRUTE.textFaint, marginBottom: 8 }}>СТОИМОСТЬ ОДНОГО ДНЯ В ДОЛЛАРАХ</div>
+      <Stepper value={v} onChange={setV} min={0} max={500} step={1} unit="$" big onHaptic={hapticLight}/>
       <div className="brute-caption" style={{ color: BRUTE.textFaint, marginTop: 10 }}>
         Грубая прикидка — что ты обычно спускал. Поставь 0 чтоб скрыть счётчик денег.
       </div>

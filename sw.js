@@ -1,5 +1,5 @@
 // BRUTE service worker — offline-first cache
-const VERSION = 'brute-v9-2026-04-25-g';
+const VERSION = 'brute-v10-2026-04-25-h';
 const ASSETS = [
   './',
   './index.html',

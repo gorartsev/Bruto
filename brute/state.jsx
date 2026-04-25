@@ -19,7 +19,7 @@ const INITIAL_STATE = {
     theme: 'light',
     cleanSinceISO: null,
     cleanReasons: [],         // ["Девушка", "Спорт", "Деньги", ...]
-    dailyCostRub: 0,           // for money-saved counter (0 = disabled)
+    dailyCostUsd: 0,           // for money-saved counter ($, 0 = disabled)
     createdAtISO: null,
   },
   sessions: [],
@@ -55,7 +55,12 @@ function loadState() {
     parsed.photoJournal = parsed.photoJournal || [];
     parsed.weeklyReviewsSeen = parsed.weeklyReviewsSeen || [];
     parsed.profile.cleanReasons = parsed.profile.cleanReasons || [];
-    parsed.profile.dailyCostRub = parsed.profile.dailyCostRub || 0;
+    // migrate dailyCostRub → dailyCostUsd if needed
+    if (parsed.profile.dailyCostUsd == null && parsed.profile.dailyCostRub != null) {
+      parsed.profile.dailyCostUsd = Math.round((parsed.profile.dailyCostRub || 0) / 90);
+    }
+    parsed.profile.dailyCostUsd = parsed.profile.dailyCostUsd || 0;
+    delete parsed.profile.dailyCostRub;
     parsed.activeSession = parsed.activeSession || null;
     return parsed;
   } catch (e) {
@@ -312,8 +317,8 @@ function BruteProvider({ children }) {
     setCleanReasons(arr) {
       setState((s) => ({ ...s, profile: { ...s.profile, cleanReasons: arr } }));
     },
-    setDailyCost(rub) {
-      setState((s) => ({ ...s, profile: { ...s.profile, dailyCostRub: rub } }));
+    setDailyCost(usd) {
+      setState((s) => ({ ...s, profile: { ...s.profile, dailyCostUsd: usd } }));
     },
 
     // ── Urge log ──
@@ -526,7 +531,7 @@ function moodAverage(moodLog, days = 7, todayISO) {
 // ── Money saved ──
 function moneySaved(profile, todayISO, relapseDates) {
   const days = daysClean(profile.cleanSinceISO, todayISO, relapseDates);
-  return Math.max(0, days * (profile.dailyCostRub || 0));
+  return Math.max(0, days * (profile.dailyCostUsd || 0));
 }
 
 // ── Letter unlock check ──

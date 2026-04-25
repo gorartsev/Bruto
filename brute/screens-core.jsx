@@ -876,7 +876,7 @@ function SessionCompleteApp({ lastSession, onClose }) {
     <PhoneScreen background={BRUTE.bg}>
       <ScrollArea padding="50px 24px 120px">
         <div style={{ textAlign: 'center' }}>
-          <FlashTombstone size={140} color={BRUTE.bone} liftLabel={`НЕДЕЛЯ ${String(week).padStart(2,'0')}`} topText="ПЕЧАТЬ" subText="НЕДЕЛИ"/>
+          <FlashTombstone size={140} color={BRUTE.text} liftLabel={`НЕДЕЛЯ ${String(week).padStart(2,'0')}`} topText="ПЕЧАТЬ" subText="НЕДЕЛИ"/>
           <div className="brute-display" style={{ fontSize: 48, color: BRUTE.text, marginTop: 16, letterSpacing: '-0.02em', lineHeight: 0.9 }}>
             ТРЕНИРОВКА<br/>ЗАКРЫТА.
           </div>

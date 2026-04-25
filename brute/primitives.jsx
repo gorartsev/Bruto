@@ -81,9 +81,9 @@ function RepCells({ target, completed, onTap, color = BRUTE.blood }) {
             }}>
             <div style={{
               position: 'absolute', inset: 0,
-              border: `2px solid ${BRUTE.ink}`,
+              border: `2px solid ${BRUTE.text}`,
               borderRadius: 8,
-              background: done ? 'transparent' : BRUTE.bone,
+              background: done ? 'transparent' : BRUTE.surface,
             }}/>
             {done && (
               <svg viewBox="0 0 100 100" preserveAspectRatio="none"
@@ -95,7 +95,7 @@ function RepCells({ target, completed, onTap, color = BRUTE.blood }) {
             )}
             <span className="brute-mono" style={{
               position: 'relative',
-              color: done ? BRUTE.paper : BRUTE.ink,
+              color: done ? BRUTE.surface : BRUTE.text,
               fontSize: 18, fontWeight: 700,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               width: '100%', height: '100%',
