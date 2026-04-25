@@ -1,5 +1,5 @@
 // BRUTE service worker — offline-first cache
-const VERSION = 'brute-v3-2026-04-25-a';
+const VERSION = 'brute-v4-2026-04-25-b';
 const ASSETS = [
   './',
   './index.html',
@@ -19,6 +19,7 @@ const ASSETS = [
   './brute/ui.jsx',
   './brute/screens-core.jsx',
   './brute/screens-nav.jsx',
+  './brute/screens-wellness.jsx',
   './brute/app.jsx',
   'https://unpkg.com/react@18.3.1/umd/react.development.js',
   'https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js',

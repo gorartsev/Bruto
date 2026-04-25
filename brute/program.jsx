@@ -37,6 +37,14 @@ const EXERCISES = {
   plank:          { key: 'plank',      lift: null,  name: 'ПЛАНКА',          nameEn: 'WEIGHTED PLANK', cat: 'acc', unit: 'kg' },
   hangingLeg:     { key: 'hangingLeg', lift: null,  name: 'УГОЛОК В ВИСЕ',   nameEn: 'HANGING LEG RAISE', cat: 'acc', unit: 'bw' },
   bikeZ2:         { key: 'bikeZ2',     lift: null,  name: 'БАЙК Z2',         nameEn: 'BIKE Z2',       cat: 'cond', unit: 'min' },
+  // ── New finisher exercises (added v4) ──
+  dbCurl:         { key: 'dbCurl',     lift: null,  name: 'СГИБ. ГАНТЕЛИ',    nameEn: 'DB CURL',       cat: 'acc',  unit: 'kg' },
+  hammerCurl:     { key: 'hammerCurl', lift: null,  name: 'МОЛОТКИ',          nameEn: 'HAMMER CURL',   cat: 'acc',  unit: 'kg' },
+  zottmanCurl:    { key: 'zottmanCurl', lift: null, name: 'ЗОТТМАН',           nameEn: 'ZOTTMAN CURL',  cat: 'acc',  unit: 'kg' },
+  skullCrusher:   { key: 'skullCrusher', lift: null, name: 'ФРАНЦУЗСКИЙ ЖИМ',  nameEn: 'SKULL CRUSHER', cat: 'acc',  unit: 'kg' },
+  reverseCurl:    { key: 'reverseCurl', lift: null, name: 'ОБРАТНЫЕ СГИБАНИЯ',nameEn: 'REVERSE CURL',  cat: 'acc',  unit: 'kg' },
+  reverseFly:     { key: 'reverseFly', lift: null,  name: 'РАЗВ. В НАКЛОНЕ',   nameEn: 'REVERSE FLY',   cat: 'acc',  unit: 'kg' },
+  ringFacePull:   { key: 'ringFacePull', lift: null, name: 'ТЯГА К ЛИЦУ',      nameEn: 'RING FACE PULL', cat: 'acc', unit: 'bw' },
 };
 
 // cues per lift (main lifts only — accessories display generic tips)
@@ -92,13 +100,16 @@ const P1_MON = {
 };
 const P1_TUE = {
   theme: 'ТЯЖЁЛЫЙ ЖИМ',
-  subtheme: '+ ПОДТЯГИВАНИЯ С ВЕСОМ',
+  subtheme: '+ ПОДТЯГИВАНИЯ · БИЦЕПС',
   exercises: [
-    { ex: 'bench',         sets: 3, reps: 5, rest: 210, rule: 'lp-main',     lift: 'bench'  },
-    { ex: 'pullup',        sets: 5, reps: 3, rest: 150, rule: 'lp-pullup',   lift: 'pullup' },
-    { ex: 'dbBench',       sets: 3, reps: 10, rest: 90, rule: 'moderate'    },
-    { ex: 'ringRow',       sets: 3, reps: 12, rest: 75, rule: 'bodyweight'  },
-    { ex: 'pullApart',     sets: 4, reps: 25, rest: 45, rule: 'band'        },
+    { ex: 'bench',         sets: 3, reps: 5,  rest: 210, rule: 'lp-main',     lift: 'bench'  },
+    { ex: 'pullup',        sets: 5, reps: 3,  rest: 150, rule: 'lp-pullup',   lift: 'pullup' },
+    { ex: 'dbBench',       sets: 3, reps: 10, rest: 90,  rule: 'moderate'    },
+    { ex: 'ringRow',       sets: 3, reps: 12, rest: 90,  rule: 'bodyweight', note: 'ноги выше для тяжелее' },
+    { ex: 'ringFacePull',  sets: 4, reps: 15, rest: 60,  rule: 'bodyweight'  },
+    // Biceps finisher
+    { ex: 'dbCurl',        sets: 3, reps: 11, rest: 60,  rule: 'moderate', note: 'медленный негатив' },
+    { ex: 'hammerCurl',    sets: 2, reps: 12, rest: 60,  rule: 'moderate', note: 'добивай брахиалис' },
   ],
 };
 const P1_WED = {
@@ -112,6 +123,7 @@ const P1_WED = {
     { ex: 'farmerCarry',   sets: 3, reps: 1, rest: 75,  rule: 'heavy',   note: '40м' },
     { ex: 'tgu',           sets: 3, reps: 1, rest: 60,  rule: 'moderate', note: 'каждая сторона' },
     { ex: 'ringPushup',    sets: 3, reps: 10, rest: 60, rule: 'bodyweight', note: 'AMRAP − 2' },
+    { ex: 'zottmanCurl',   sets: 3, reps: 10, rest: 60, rule: 'moderate', note: 'опционально' },
   ],
 };
 const P1_THU = {
@@ -127,13 +139,16 @@ const P1_THU = {
 };
 const P1_FRI = {
   theme: 'ТЯЖЁЛЫЙ ЖИМ СТОЯ',
-  subtheme: '+ УЗКИЙ ЖИМ · КОЛЬЦА',
+  subtheme: '+ УЗКИЙ · КОЛЬЦА · ТРИЦЕПС',
   exercises: [
-    { ex: 'ohp',           sets: 3, reps: 5, rest: 210, rule: 'lp-main',     lift: 'ohp'    },
-    { ex: 'closeGrip',     sets: 4, reps: 6, rest: 150, rule: 'pct1rm',      lift: 'bench', pct: 0.60 },
-    { ex: 'ringDip',       sets: 4, reps: 7, rest: 120, rule: 'bodyweight',  note: 'с весом когда 3×10 чисто' },
-    { ex: 'dbRow',         sets: 3, reps: 10, rest: 75, rule: 'moderate'    },
-    { ex: 'facePull',      sets: 4, reps: 25, rest: 45, rule: 'moderate'    },
+    { ex: 'ohp',           sets: 3, reps: 5,  rest: 210, rule: 'lp-main',     lift: 'ohp'    },
+    { ex: 'closeGrip',     sets: 4, reps: 6,  rest: 150, rule: 'pct1rm',      lift: 'bench', pct: 0.60 },
+    { ex: 'ringDip',       sets: 4, reps: 7,  rest: 120, rule: 'bodyweight',  note: 'с весом когда 3×10 чисто' },
+    { ex: 'dbRow',         sets: 3, reps: 10, rest: 90,  rule: 'moderate', note: 'на сторону' },
+    { ex: 'reverseFly',    sets: 3, reps: 15, rest: 60,  rule: 'moderate', note: 'лёгкие гантели 5–7.5 кг' },
+    // Triceps + forearm finisher
+    { ex: 'skullCrusher',  sets: 3, reps: 10, rest: 60,  rule: 'moderate' },
+    { ex: 'reverseCurl',   sets: 2, reps: 12, rest: 60,  rule: 'moderate', note: 'лёгкая штанга, контроль' },
   ],
 };
 
@@ -151,14 +166,16 @@ const P2_MON = {
 };
 const P2_TUE = {
   theme: 'ЖИМ · 5/3/1',
-  subtheme: '+ FSL 5×5 + ПАУЗА',
+  subtheme: '+ FSL · ПАУЗА · БИЦЕПС',
   exercises: [
     { ex: 'bench',         rule: '531',          lift: 'bench' },
     { ex: 'bench',         rule: '531-fsl-5x5', lift: 'bench', labelKey: 'fsl' },
-    { ex: 'pausedBench',   sets: 3, reps: 3, rest: 120, rule: 'pct-tm', lift: 'bench', pct: 0.70 },
-    { ex: 'pullup',        sets: 5, reps: 4, rest: 120, rule: 'lp-pullup', lift: 'pullup' },
-    { ex: 'dbBench',       sets: 3, reps: 10, rest: 75, rule: 'moderate' },
-    { ex: 'pullApart',     sets: 4, reps: 25, rest: 45, rule: 'band' },
+    { ex: 'pausedBench',   sets: 3, reps: 3,  rest: 150, rule: 'pct-tm', lift: 'bench', pct: 0.70 },
+    { ex: 'pullup',        sets: 5, reps: 4,  rest: 120, rule: 'lp-pullup', lift: 'pullup' },
+    { ex: 'dbBench',       sets: 3, reps: 10, rest: 90,  rule: 'moderate' },
+    { ex: 'ringFacePull',  sets: 4, reps: 15, rest: 60,  rule: 'bodyweight' },
+    { ex: 'dbCurl',        sets: 3, reps: 11, rest: 60,  rule: 'moderate' },
+    { ex: 'hammerCurl',    sets: 2, reps: 12, rest: 60,  rule: 'moderate' },
   ],
 };
 const P2_WED = P1_WED;
@@ -176,14 +193,16 @@ const P2_THU = {
 };
 const P2_FRI = {
   theme: 'ЖИМ СТОЯ · 5/3/1',
-  subtheme: '+ FSL 5×5 · УЗКИЙ',
+  subtheme: '+ FSL · УЗКИЙ · ТРИЦЕПС',
   exercises: [
     { ex: 'ohp',           rule: '531',          lift: 'ohp' },
     { ex: 'ohp',           rule: '531-fsl-5x5', lift: 'ohp', labelKey: 'fsl' },
-    { ex: 'closeGrip',     sets: 4, reps: 6, rest: 120, rule: 'pct-tm', lift: 'bench', pct: 0.65 },
-    { ex: 'ringDip',       sets: 4, reps: 7, rest: 90, rule: 'bodyweight' },
-    { ex: 'dbRow',         sets: 4, reps: 10, rest: 75, rule: 'moderate' },
-    { ex: 'facePull',      sets: 3, reps: 20, rest: 45, rule: 'moderate' },
+    { ex: 'closeGrip',     sets: 4, reps: 6,  rest: 150, rule: 'pct-tm', lift: 'bench', pct: 0.65 },
+    { ex: 'ringDip',       sets: 4, reps: 7,  rest: 120, rule: 'bodyweight' },
+    { ex: 'dbRow',         sets: 4, reps: 10, rest: 90,  rule: 'moderate', note: 'на сторону' },
+    { ex: 'reverseFly',    sets: 3, reps: 15, rest: 60,  rule: 'moderate', note: 'лёгкие гантели' },
+    { ex: 'skullCrusher',  sets: 3, reps: 10, rest: 60,  rule: 'moderate' },
+    { ex: 'reverseCurl',   sets: 2, reps: 12, rest: 60,  rule: 'moderate' },
   ],
 };
 

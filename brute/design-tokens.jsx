@@ -2,6 +2,7 @@
 // Punk tattoo-zine aesthetic. No gradients, no glass blur, no bouncy springs.
 
 const BRUTE = {
+  // Raw palette (kept for backward compat)
   ink:    '#0A0A0A',
   bone:   '#F4ECD8',
   blood:  '#B3121A',
@@ -10,6 +11,18 @@ const BRUTE = {
   ash:    '#6B6B6B',
   bruise: '#4A1518',
   orange: '#E85C2C',
+
+  // ─── Light-theme semantic tokens ───
+  // Page bg = bone (warm cream), card surface = paper white, text = ink.
+  bg:         '#F4ECD8',
+  surface:    '#FFFFFF',
+  surfaceAlt: '#EBE2CB',     // chip / secondary fill
+  text:       '#0A0A0A',
+  textMuted:  '#2A2A2A',
+  textFaint:  '#6B6B6B',
+  accent:     '#B3121A',     // alias for blood
+  border:     'rgba(10,10,10,0.14)',
+  separator:  'rgba(10,10,10,0.08)',
 };
 
 // ─── Brushstroke SVG library ────────────────────────────────────────────────

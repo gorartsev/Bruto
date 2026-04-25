@@ -492,6 +492,143 @@ function ArtBike({ color }) {
   );
 }
 
+// ─── Curl family (dumbbell biceps work) ─────────────────────────────────────
+function ArtDBCurl({ color }) {
+  const S = exStyle(color);
+  return (
+    <svg viewBox="0 0 100 100" width="100%" height="100%">
+      <line x1="14" y1="94" x2="86" y2="94" {...S}/>
+      <circle cx="50" cy="22" r="6" {...S}/>
+      <path d="M50 28 L50 66 M50 66 L42 90 M50 66 L58 90" {...S}/>
+      <g className="ex-press" style={{ transformOrigin: 'center bottom' }}>
+        {/* upper arms static, forearms curl up */}
+        <path d="M44 36 L42 56" {...S}/>
+        <path d="M42 56 L52 38" {...S}/>
+        <path d="M56 36 L58 56" {...S}/>
+        <path d="M58 56 L48 38" {...S}/>
+        {/* dumbbells at wrists (top-of-curl pose) */}
+        <line x1="44" y1="34" x2="56" y2="34" {...S}/>
+        <rect x="40" y="30" width="6" height="8" rx="1" {...fillOf(color)}/>
+        <rect x="54" y="30" width="6" height="8" rx="1" {...fillOf(color)}/>
+      </g>
+    </svg>
+  );
+}
+
+function ArtHammerCurl({ color }) {
+  // Same body, dumbbells held vertically (neutral grip)
+  const S = exStyle(color);
+  return (
+    <svg viewBox="0 0 100 100" width="100%" height="100%">
+      <line x1="14" y1="94" x2="86" y2="94" {...S}/>
+      <circle cx="50" cy="22" r="6" {...S}/>
+      <path d="M50 28 L50 66 M50 66 L42 90 M50 66 L58 90" {...S}/>
+      <g className="ex-press" style={{ transformOrigin: 'center bottom' }}>
+        <path d="M44 36 L40 56 L42 38" {...S}/>
+        <path d="M56 36 L60 56 L58 38" {...S}/>
+        {/* vertical dumbbells */}
+        <rect x="38" y="30" width="6" height="14" rx="1" {...fillOf(color)}/>
+        <rect x="56" y="30" width="6" height="14" rx="1" {...fillOf(color)}/>
+      </g>
+    </svg>
+  );
+}
+
+function ArtZottmanCurl({ color }) {
+  // Curl with rotating wrist — show one arm pronated, one supinated
+  const S = exStyle(color);
+  return (
+    <svg viewBox="0 0 100 100" width="100%" height="100%">
+      <line x1="14" y1="94" x2="86" y2="94" {...S}/>
+      <circle cx="50" cy="22" r="6" {...S}/>
+      <path d="M50 28 L50 66 M50 66 L42 90 M50 66 L58 90" {...S}/>
+      <g className="ex-press" style={{ transformOrigin: 'center bottom' }}>
+        <path d="M44 36 L40 56" {...S}/>
+        <path d="M40 56 L52 40" {...S}/>
+        <path d="M56 36 L60 56" {...S}/>
+        <path d="M60 56 L48 36" {...S}/>
+        <line x1="44" y1="36" x2="56" y2="36" {...S}/>
+        <rect x="40" y="32" width="6" height="8" rx="1" {...fillOf(color)}/>
+        <rect x="54" y="32" width="6" height="8" rx="1" {...fillOf(color)}/>
+        {/* rotation arrow */}
+        <path d="M50 24 q 8 -2 6 6" {...S}/>
+        <path d="M54 32 L56 30 L58 32" {...S}/>
+      </g>
+    </svg>
+  );
+}
+
+// ─── Triceps / forearm finishers ────────────────────────────────────────────
+function ArtSkullCrusher({ color }) {
+  const S = exStyle(color);
+  return (
+    <svg viewBox="0 0 100 100" width="100%" height="100%">
+      {/* bench */}
+      <rect x="18" y="62" width="64" height="6" rx="1" {...fillOf(color)}/>
+      <line x1="22" y1="68" x2="22" y2="82" {...S}/>
+      <line x1="78" y1="68" x2="78" y2="82" {...S}/>
+      {/* lying */}
+      <circle cx="24" cy="56" r="5" {...S}/>
+      <path d="M30 58 L70 58 M70 58 L76 74 M66 58 L72 74" {...S}/>
+      {/* upper arms static vertical, forearms move (animation pivot at elbow) */}
+      <path d="M50 58 L50 38" {...S}/>
+      <path d="M46 58 L46 38" {...S}/>
+      <g className="ex-press" style={{ transformOrigin: '48px 38px' }}>
+        <path d="M50 38 L40 26" {...S}/>
+        <path d="M46 38 L36 26" {...S}/>
+        <line x1="32" y1="22" x2="44" y2="22" {...S}/>
+        <rect x="28" y="18" width="6" height="8" rx="1" {...fillOf(color)}/>
+        <rect x="42" y="18" width="6" height="8" rx="1" {...fillOf(color)}/>
+      </g>
+    </svg>
+  );
+}
+
+function ArtReverseCurl({ color }) {
+  // Pronated grip (palms down) curl with barbell
+  const S = exStyle(color);
+  return (
+    <svg viewBox="0 0 100 100" width="100%" height="100%">
+      <line x1="14" y1="94" x2="86" y2="94" {...S}/>
+      <circle cx="50" cy="22" r="6" {...S}/>
+      <path d="M50 28 L50 66 M50 66 L42 90 M50 66 L58 90" {...S}/>
+      <g className="ex-press" style={{ transformOrigin: 'center bottom' }}>
+        {/* arms forearms curl up */}
+        <path d="M44 36 L42 56 L46 38" {...S}/>
+        <path d="M56 36 L58 56 L54 38" {...S}/>
+        {/* barbell — pronated grip (knuckles up) */}
+        <line x1="22" y1="36" x2="78" y2="36" {...S}/>
+        <rect x="16" y="30" width="6" height="14" {...fillOf(color)}/>
+        <rect x="78" y="30" width="6" height="14" {...fillOf(color)}/>
+        {/* knuckle dots above bar */}
+        <circle cx="44" cy="34" r="1.5" fill={color}/>
+        <circle cx="56" cy="34" r="1.5" fill={color}/>
+      </g>
+    </svg>
+  );
+}
+
+function ArtReverseFly({ color }) {
+  // Bent over, arms wide like wings
+  const S = exStyle(color);
+  return (
+    <svg viewBox="0 0 100 100" width="100%" height="100%">
+      <line x1="14" y1="94" x2="86" y2="94" {...S}/>
+      <circle cx="50" cy="34" r="6" {...S}/>
+      <path d="M50 40 L50 60" {...S}/>
+      <path d="M50 60 L42 88" {...S}/>
+      <path d="M50 60 L58 88" {...S}/>
+      <g className="ex-spread" style={{ transformOrigin: '50px 50px' }}>
+        {/* arms out wide with DBs */}
+        <path d="M48 46 L20 50" {...S}/>
+        <path d="M52 46 L80 50" {...S}/>
+        <rect x="10" y="46" width="14" height="8" rx="1" {...fillOf(color)}/>
+        <rect x="76" y="46" width="14" height="8" rx="1" {...fillOf(color)}/>
+      </g>
+    </svg>
+  );
+}
+
 // ─── Placeholder ────────────────────────────────────────────────────────────
 function ArtPlaceholder({ color }) {
   const S = exStyle(color);
@@ -537,6 +674,14 @@ const ART_MAP = {
   hangingLeg:     ArtHangingLeg,
   prowler:        ArtProwler,
   bikeZ2:         ArtBike,
+  // ── New finisher art (v4) ──
+  dbCurl:         ArtDBCurl,
+  hammerCurl:     ArtHammerCurl,
+  zottmanCurl:    ArtZottmanCurl,
+  skullCrusher:   ArtSkullCrusher,
+  reverseCurl:    ArtReverseCurl,
+  reverseFly:     ArtReverseFly,
+  ringFacePull:   ArtFacePull,
 };
 
 function ExerciseArt({ exerciseKey, size = 48, color = BRUTE.ink, bg = null, rounded = true, pad = 0 }) {

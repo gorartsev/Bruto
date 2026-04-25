@@ -38,7 +38,7 @@ function Onboarding({ onDone }) {
           <input value={name} onChange={(e) => setName(e.target.value)}
             placeholder="ИМЯ"
             style={onbInput}/>
-          <div className="brute-caption" style={{ color: BRUTE.ash, marginTop: 12 }}>
+          <div className="brute-caption" style={{ color: BRUTE.textFaint, marginTop: 12 }}>
             Это нигде не светится. Просто как тебя позвать.
           </div>
         </div>
@@ -55,12 +55,12 @@ function Onboarding({ onDone }) {
             { k: 'ohp',      l: 'ЖИМ СТОЯ' },
           ].map(({ k, l }) => (
             <div key={k}>
-              <div className="brute-caption" style={{ color: BRUTE.ash, marginBottom: 6 }}>{l} · РМ</div>
+              <div className="brute-caption" style={{ color: BRUTE.textFaint, marginBottom: 6 }}>{l} · РМ</div>
               <Stepper value={oneRM[k]} onChange={(v) => setOneRM({ ...oneRM, [k]: v })}
                 min={20} max={400} step={2.5} onHaptic={hapticLight} unit="КГ"/>
             </div>
           ))}
-          <div className="brute-caption" style={{ color: BRUTE.ash, marginTop: 4 }}>
+          <div className="brute-caption" style={{ color: BRUTE.textFaint, marginTop: 4 }}>
             Прикидочно — ок. Точные проверим на 12-й неделе.
           </div>
         </div>
@@ -70,9 +70,9 @@ function Onboarding({ onDone }) {
       title: 'ВЗВЕШИВАНИЕ.',
       body: (
         <div>
-          <div className="brute-caption" style={{ color: BRUTE.ash, marginBottom: 6 }}>ВЕС ТЕЛА</div>
+          <div className="brute-caption" style={{ color: BRUTE.textFaint, marginBottom: 6 }}>ВЕС ТЕЛА</div>
           <Stepper value={bw} onChange={setBW} min={40} max={200} step={0.5} onHaptic={hapticLight} unit="КГ" big/>
-          <div className="brute-caption" style={{ color: BRUTE.ash, marginTop: 14 }}>
+          <div className="brute-caption" style={{ color: BRUTE.textFaint, marginTop: 14 }}>
             Нужен чтобы считать подтягивания и отжимания с весом, и тренды.
           </div>
         </div>
@@ -82,10 +82,10 @@ function Onboarding({ onDone }) {
       title: 'КОГДА СТАРТ?',
       body: (
         <div>
-          <div className="brute-caption" style={{ color: BRUTE.ash, marginBottom: 6 }}>ПЕРВЫЙ ДЕНЬ</div>
+          <div className="brute-caption" style={{ color: BRUTE.textFaint, marginBottom: 6 }}>ПЕРВЫЙ ДЕНЬ</div>
           <input type="date" value={startISO} onChange={(e) => setStartISO(e.target.value)}
             style={onbInput}/>
-          <div className="brute-caption" style={{ color: BRUTE.ash, marginTop: 12 }}>
+          <div className="brute-caption" style={{ color: BRUTE.textFaint, marginTop: 12 }}>
             Программа привяжется к понедельнику этой недели. 12 недель, 5 дней в неделю.
           </div>
         </div>
@@ -96,15 +96,15 @@ function Onboarding({ onDone }) {
   const s = steps[step];
 
   return (
-    <PhoneScreen background={BRUTE.ink}>
+    <PhoneScreen background={BRUTE.bg}>
       <TopBar
         left={step > 0 ? <BackButton onClick={back}/> : <div/>}
-        center={<div className="brute-caption" style={{ color: BRUTE.ash }}>{step + 1} / 4</div>}
+        center={<div className="brute-caption" style={{ color: BRUTE.textFaint }}>{step + 1} / 4</div>}
         right={<div/>}/>
 
       <ScrollArea padding="24px 24px 120px">
         <div className="brute-display" style={{
-          fontSize: 44, lineHeight: 0.95, color: BRUTE.paper,
+          fontSize: 44, lineHeight: 0.95, color: BRUTE.text,
           letterSpacing: '-0.02em', marginBottom: 24,
         }}>{s.title}</div>
 
@@ -117,7 +117,7 @@ function Onboarding({ onDone }) {
         position: 'absolute', left: 0, right: 0, bottom: 0,
         padding: '16px 20px 28px',
         paddingBottom: 'calc(env(safe-area-inset-bottom) + 20px)',
-        background: `linear-gradient(to top, ${BRUTE.ink} 60%, transparent)`,
+        background: `linear-gradient(to top, ${BRUTE.bg} 60%, transparent)`,
       }}>
         <BrushButton onClick={next} variant="slab" color={BRUTE.blood} fontSize={28}>
           {step === 3 ? 'ЗАЖИГАЙ' : 'ДАЛЬШЕ'}
@@ -155,17 +155,17 @@ function TodayScreenApp({ onStartSession, onOpenLog }) {
   const last = sessions.length > 0 ? sessions[sessions.length - 1] : null;
 
   return (
-    <PhoneScreen background={BRUTE.ink}>
+    <PhoneScreen background={BRUTE.bg}>
       <ScrollArea padding="12px 20px 110px">
         {/* header strip */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
-            <span className="brute-display" style={{ fontSize: 28, color: BRUTE.paper, letterSpacing: '0.04em' }}>BRUTE</span>
+            <span className="brute-display" style={{ fontSize: 28, color: BRUTE.text, letterSpacing: '0.04em' }}>BRUTE</span>
             <span style={{ width: 6, height: 6, background: BRUTE.blood, borderRadius: '50%' }}/>
           </div>
           {streak > 0 && <StreakBadge count={streak}/>}
         </div>
-        <div className="brute-caption" style={{ color: BRUTE.ash, marginTop: 4 }}>{weekHeader}</div>
+        <div className="brute-caption" style={{ color: BRUTE.textFaint, marginTop: 4 }}>{weekHeader}</div>
 
         {/* Main content by state */}
         {today.kind === 'before' && <BeforeStartCard startISO={profile.startDateISO}/>}
@@ -201,11 +201,11 @@ function StatChip({ label, value }) {
   return (
     <div style={{
       flex: '0 0 auto', minWidth: 86,
-      background: BRUTE.smoke, borderRadius: 12, padding: '10px 12px',
+      background: BRUTE.surfaceAlt, borderRadius: 12, padding: '10px 12px',
     }}>
-      <div className="brute-caption" style={{ color: BRUTE.ash, fontSize: 9 }}>{label}</div>
-      <div className="brute-mono" style={{ color: BRUTE.paper, fontSize: 22, fontWeight: 700, marginTop: 4 }}>
-        {value}<span style={{ color: BRUTE.ash, fontSize: 11, marginLeft: 3 }}>КГ</span>
+      <div className="brute-caption" style={{ color: BRUTE.textFaint, fontSize: 9 }}>{label}</div>
+      <div className="brute-mono" style={{ color: BRUTE.text, fontSize: 22, fontWeight: 700, marginTop: 4 }}>
+        {value}<span style={{ color: BRUTE.textFaint, fontSize: 11, marginLeft: 3 }}>КГ</span>
       </div>
     </div>
   );
@@ -349,18 +349,18 @@ function LastSessionRecap({ session }) {
   });
 
   return (
-    <BruteCard tone="ink" padding={16} grit={1} style={{ border: `1px solid ${BRUTE.smoke}` }}>
+    <BruteCard tone="ink" padding={16} grit={1} style={{ border: `1px solid ${BRUTE.border}` }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-        <div className="brute-caption" style={{ color: BRUTE.ash }}>ВЧЕРА · {date}</div>
-        <div className="brute-display" style={{ color: BRUTE.paper, fontSize: 16 }}>{session.theme}</div>
+        <div className="brute-caption" style={{ color: BRUTE.textFaint }}>ВЧЕРА · {date}</div>
+        <div className="brute-display" style={{ color: BRUTE.text, fontSize: 16 }}>{session.theme}</div>
       </div>
       {rows.length > 0 && (
         <div style={{ marginTop: 10, display: 'flex', flexDirection: 'column', gap: 4 }}>
           {rows.map((r, i) => (
             <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ color: BRUTE.paper, fontFamily: 'Inter, system-ui', fontSize: 13 }}>{r.lift}</span>
+              <span style={{ color: BRUTE.text, fontFamily: 'Inter, system-ui', fontSize: 13 }}>{r.lift}</span>
               <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                <span className="brute-mono" style={{ color: BRUTE.paper, fontSize: 14, fontWeight: 600 }}>{r.value}</span>
+                <span className="brute-mono" style={{ color: BRUTE.text, fontSize: 14, fontWeight: 600 }}>{r.value}</span>
                 {r.pr && <span className="brute-caption" style={{ color: BRUTE.blood, fontSize: 10 }}>РМ</span>}
               </span>
             </div>
@@ -485,10 +485,10 @@ function ActiveWorkoutApp({ onExit, onPR, onSessionComplete }) {
   const nextPreview = a.plannedExercises.slice(a.currentIdx + 1, a.currentIdx + 3);
 
   return (
-    <PhoneScreen background={BRUTE.ink}>
+    <PhoneScreen background={BRUTE.bg}>
       <TopBar
         left={<CloseXButton onClick={() => setExitConfirm(true)}/>}
-        center={<div className="brute-display" style={{ color: BRUTE.paper, fontSize: 20, letterSpacing: '0.04em' }}>
+        center={<div className="brute-display" style={{ color: BRUTE.text, fontSize: 20, letterSpacing: '0.04em' }}>
           {a.theme}
         </div>}
         right={<SessionTimer seconds={elapsed}/>}
@@ -525,7 +525,7 @@ function ActiveWorkoutApp({ onExit, onPR, onSessionComplete }) {
               <div className="brute-mono" style={{ color: BRUTE.ink, fontSize: 62, fontWeight: 700, letterSpacing: '-0.02em', lineHeight: 1 }}>
                 {actualKg}<span style={{ color: BRUTE.bruise, fontSize: 20, marginLeft: 8 }}>КГ × {targetReps}{ex.amrap ? '+' : ''}</span>
               </div>
-              <div className="brute-caption" style={{ color: BRUTE.ash, marginTop: 4 }}>
+              <div className="brute-caption" style={{ color: BRUTE.textFaint, marginTop: 4 }}>
                 {ex.amrap ? 'КАК МОЖНО БОЛЬШЕ' : 'НАЖМИ ЧТОБЫ ИЗМЕНИТЬ ВЕС'}
               </div>
             </button>
@@ -569,20 +569,20 @@ function ActiveWorkoutApp({ onExit, onPR, onSessionComplete }) {
         {/* up-next strip */}
         {nextPreview.length > 0 && (
           <div style={{ marginTop: 20 }}>
-            <div className="brute-caption" style={{ color: BRUTE.ash, marginBottom: 6 }}>ДАЛЕЕ →</div>
+            <div className="brute-caption" style={{ color: BRUTE.textFaint, marginBottom: 6 }}>ДАЛЕЕ →</div>
             <div style={{ display: 'flex', gap: 8, overflowX: 'auto' }}>
               {nextPreview.map((e, i) => (
                 <div key={i} style={{
-                  flex: '0 0 auto', background: BRUTE.smoke,
+                  flex: '0 0 auto', background: BRUTE.surfaceAlt,
                   padding: '10px 14px', borderRadius: 10, minWidth: 140,
                   display: 'flex', alignItems: 'center', gap: 10,
                 }}>
-                  <ExerciseArt exerciseKey={e.ex} size={32} color={BRUTE.paper}/>
+                  <ExerciseArt exerciseKey={e.ex} size={32} color={BRUTE.text}/>
                   <div>
-                    <div className="brute-display" style={{ color: BRUTE.paper, fontSize: 14, letterSpacing: '0.02em' }}>
+                    <div className="brute-display" style={{ color: BRUTE.text, fontSize: 14, letterSpacing: '0.02em' }}>
                       {e.exDef.name}
                     </div>
-                    <div className="brute-mono" style={{ color: BRUTE.ash, fontSize: 11, marginTop: 2 }}>
+                    <div className="brute-mono" style={{ color: BRUTE.textFaint, fontSize: 11, marginTop: 2 }}>
                       {exerciseScheme(e)}
                     </div>
                   </div>
@@ -634,9 +634,9 @@ function ActiveWorkoutApp({ onExit, onPR, onSessionComplete }) {
           placeholder="Быстро зафиксируй — что было в подходе"
           rows={5}
           style={{
-            width: '100%', padding: 12, background: BRUTE.smoke,
-            border: `1px solid ${BRUTE.ash}`, borderRadius: 8,
-            color: BRUTE.paper, fontFamily: 'Inter, system-ui', fontSize: 15,
+            width: '100%', padding: 12, background: BRUTE.surfaceAlt,
+            border: `1px solid ${BRUTE.border}`, borderRadius: 8,
+            color: BRUTE.text, fontFamily: 'Inter, system-ui', fontSize: 15,
             boxSizing: 'border-box', resize: 'vertical',
           }}/>
         <div style={{ marginTop: 20 }}>
@@ -653,7 +653,7 @@ function ActiveWorkoutApp({ onExit, onPR, onSessionComplete }) {
 
       {/* exit confirm */}
       <Sheet open={exitConfirm} onClose={() => setExitConfirm(false)} title="ВЫЙТИ?" height="45%">
-        <div style={{ color: BRUTE.ash, marginBottom: 20 }}>
+        <div style={{ color: BRUTE.textFaint, marginBottom: 20 }}>
           Записанные подходы сохранятся. Незаконченная тренировка не зачтётся в стрик.
         </div>
         <BrushButton onClick={() => { actions.cancelSession(); onExit(); }} variant="slab" color={BRUTE.blood} fontSize={22}>
@@ -662,8 +662,8 @@ function ActiveWorkoutApp({ onExit, onPR, onSessionComplete }) {
         <div style={{ marginTop: 10 }}>
           <button onClick={() => setExitConfirm(false)} style={{
             width: '100%', padding: '14px', background: 'transparent',
-            border: `1px solid ${BRUTE.smoke}`, borderRadius: 10,
-            color: BRUTE.paper, fontFamily: "'Bebas Neue', Impact", fontSize: 20, cursor: 'pointer',
+            border: `1px solid ${BRUTE.border}`, borderRadius: 10,
+            color: BRUTE.text, fontFamily: "'Bebas Neue', Impact", fontSize: 20, cursor: 'pointer',
           }}>ОТМЕНА</button>
         </div>
       </Sheet>
@@ -677,17 +677,17 @@ const repBtnStyle = {
   color: BRUTE.ink, fontFamily: "'Bebas Neue', Impact", fontSize: 22, cursor: 'pointer',
 };
 const sheetBtnStyle = {
-  flex: 1, padding: '12px', background: BRUTE.smoke, border: 0,
-  color: BRUTE.paper, borderRadius: 8, fontFamily: "'Bebas Neue', Impact", fontSize: 16, cursor: 'pointer',
+  flex: 1, padding: '12px', background: BRUTE.surfaceAlt, border: 0,
+  color: BRUTE.text, borderRadius: 8, fontFamily: "'Bebas Neue', Impact", fontSize: 16, cursor: 'pointer',
 };
 
 function MiniBtn({ label, onClick, active }) {
   return (
     <button onClick={onClick} className="brute-press brute-no-select"
       style={{
-        background: active ? BRUTE.ink : 'transparent',
-        border: `1px solid ${active ? BRUTE.ink : BRUTE.smoke}`,
-        color: active ? BRUTE.paper : BRUTE.ink,
+        background: active ? BRUTE.text : 'transparent',
+        border: `1px solid ${active ? BRUTE.text : BRUTE.border}`,
+        color: active ? BRUTE.surface : BRUTE.text,
         padding: '6px 12px', borderRadius: 6, cursor: 'pointer',
         fontFamily: "'Bebas Neue', Impact", fontSize: 14, letterSpacing: '0.04em',
       }}>{label}</button>
@@ -700,7 +700,7 @@ function RestOverlay({ seconds, total, onSkip, onAdjust }) {
       position: 'absolute', left: 0, right: 0, bottom: 0,
       padding: '20px 20px 30px',
       paddingBottom: 'calc(env(safe-area-inset-bottom) + 20px)',
-      background: `linear-gradient(to top, ${BRUTE.ink} 70%, transparent)`,
+      background: `linear-gradient(to top, ${BRUTE.bg} 70%, transparent)`,
       display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 14,
       zIndex: 80,
     }}>
@@ -714,8 +714,8 @@ function RestOverlay({ seconds, total, onSkip, onAdjust }) {
   );
 }
 const restAdj = {
-  padding: '10px 18px', background: BRUTE.smoke, border: 0,
-  color: BRUTE.paper, borderRadius: 8,
+  padding: '10px 18px', background: BRUTE.surfaceAlt, border: 0,
+  color: BRUTE.text, borderRadius: 8,
   fontFamily: "'Bebas Neue', Impact", fontSize: 16, cursor: 'pointer',
 };
 
@@ -723,7 +723,7 @@ const restAdj = {
 function PRCelebrationApp({ pr, onDismiss }) {
   return (
     <div style={{
-      position: 'absolute', inset: 0, background: BRUTE.ink, zIndex: 900,
+      position: 'absolute', inset: 0, background: BRUTE.bg, zIndex: 900,
       display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
       padding: 'env(safe-area-inset-top) 24px env(safe-area-inset-bottom)',
     }}>
@@ -741,17 +741,17 @@ function PRCelebrationApp({ pr, onDismiss }) {
         </div>
 
         <div className="brute-caption" style={{ color: BRUTE.blood, fontSize: 13 }}>★ ЛИЧНЫЙ РЕКОРД ★</div>
-        <div className="brute-display" style={{ fontSize: 64, color: BRUTE.paper, letterSpacing: '-0.02em', marginTop: 4 }}>
+        <div className="brute-display" style={{ fontSize: 64, color: BRUTE.text, letterSpacing: '-0.02em', marginTop: 4 }}>
           НОВЫЙ РМ.
         </div>
-        <div className="brute-mono" style={{ fontSize: 72, color: BRUTE.paper, fontWeight: 700, marginTop: 6 }}>
-          {Math.round(pr.new1RM)}<span style={{ fontSize: 24, color: BRUTE.ash, marginLeft: 8 }}>КГ</span>
+        <div className="brute-mono" style={{ fontSize: 72, color: BRUTE.text, fontWeight: 700, marginTop: 6 }}>
+          {Math.round(pr.new1RM)}<span style={{ fontSize: 24, color: BRUTE.textFaint, marginLeft: 8 }}>КГ</span>
         </div>
-        <div className="brute-caption" style={{ color: BRUTE.ash, marginTop: 8 }}>
+        <div className="brute-caption" style={{ color: BRUTE.textFaint, marginTop: 8 }}>
           РМ · ЭПЛИ · {pr.weight} × {pr.reps}
         </div>
         {pr.prev > 0 && (
-          <div className="brute-caption" style={{ color: BRUTE.ash, marginTop: 4 }}>
+          <div className="brute-caption" style={{ color: BRUTE.textFaint, marginTop: 4 }}>
             БЫЛО · {pr.prev} КГ
           </div>
         )}
@@ -779,20 +779,20 @@ function SessionCompleteApp({ lastSession, onClose }) {
   const week = lastSession.coords ? lastSession.coords.week : 1;
 
   return (
-    <PhoneScreen background={BRUTE.ink}>
+    <PhoneScreen background={BRUTE.bg}>
       <ScrollArea padding="50px 24px 120px">
         <div style={{ textAlign: 'center' }}>
           <FlashTombstone size={140} color={BRUTE.bone} liftLabel={`НЕДЕЛЯ ${String(week).padStart(2,'0')}`} topText="ПЕЧАТЬ" subText="НЕДЕЛИ"/>
-          <div className="brute-display" style={{ fontSize: 48, color: BRUTE.paper, marginTop: 16, letterSpacing: '-0.02em', lineHeight: 0.9 }}>
+          <div className="brute-display" style={{ fontSize: 48, color: BRUTE.text, marginTop: 16, letterSpacing: '-0.02em', lineHeight: 0.9 }}>
             ТРЕНИРОВКА<br/>ЗАКРЫТА.
           </div>
-          <div className="brute-caption" style={{ color: BRUTE.ash, marginTop: 10 }}>
+          <div className="brute-caption" style={{ color: BRUTE.textFaint, marginTop: 10 }}>
             НЕДЕЛЯ {String(week).padStart(2, '0')} · {lastSession.theme}
           </div>
         </div>
 
         <div style={{ marginTop: 24 }}>
-          <div className="brute-caption" style={{ color: BRUTE.ash }}>ЖУРНАЛ</div>
+          <div className="brute-caption" style={{ color: BRUTE.textFaint }}>ЖУРНАЛ</div>
           <div style={{ marginTop: 8, display: 'flex', flexDirection: 'column', gap: 8 }}>
             <LedgerRow label="ПРОДОЛЖИТ." value={duration}/>
             <LedgerRow label="ОБЩИЙ ТОННАЖ" value={`${totalVolume} КГ`}/>
@@ -819,11 +819,11 @@ function LedgerRow({ label, value, highlight }) {
   return (
     <div style={{
       display: 'flex', justifyContent: 'space-between',
-      background: BRUTE.smoke, borderRadius: 8, padding: '10px 14px',
+      background: BRUTE.surfaceAlt, borderRadius: 8, padding: '10px 14px',
       border: highlight ? `1px solid ${BRUTE.blood}` : 'none',
     }}>
-      <span className="brute-caption" style={{ color: BRUTE.ash }}>{label}</span>
-      <span className="brute-mono" style={{ color: highlight ? BRUTE.blood : BRUTE.paper, fontSize: 16, fontWeight: 700 }}>
+      <span className="brute-caption" style={{ color: BRUTE.textFaint }}>{label}</span>
+      <span className="brute-mono" style={{ color: highlight ? BRUTE.blood : BRUTE.text, fontSize: 16, fontWeight: 700 }}>
         {value}
       </span>
     </div>

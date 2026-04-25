@@ -48,12 +48,12 @@ function soundPR(pack) {
 // ─── Phone screen wrapper with iOS safe-area handling ──────────────────────
 // Fills its container. Children that want the full viewport should set their
 // own backgrounds; this wrapper just provides safe-area padding helpers.
-function PhoneScreen({ children, background = BRUTE.ink, padTop = true, padBottom = true, style = {} }) {
+function PhoneScreen({ children, background = BRUTE.bg, padTop = true, padBottom = true, style = {} }) {
   // max() ensures clearance for both mobile standalone (env var) AND desktop preview iPhone status bar
   return (
     <div style={{
       position: 'absolute', inset: 0, background,
-      color: BRUTE.paper, overflow: 'hidden',
+      color: BRUTE.text, overflow: 'hidden',
       paddingTop: padTop ? 'max(54px, env(safe-area-inset-top))' : 0,
       paddingBottom: padBottom ? 'max(34px, env(safe-area-inset-bottom))' : 0,
       paddingLeft: 'env(safe-area-inset-left)',
@@ -93,9 +93,9 @@ function TopBar({ left, right, center, style = {} }) {
 function BackButton({ onClick }) {
   return (
     <button onClick={onClick} className="brute-press brute-no-select"
-      style={{ background: 'transparent', border: 0, padding: 8, cursor: 'pointer', color: BRUTE.paper }}>
+      style={{ background: 'transparent', border: 0, padding: 8, cursor: 'pointer', color: BRUTE.text }}>
       <svg width="14" height="22" viewBox="0 0 14 22" fill="none">
-        <path d="M12 2L2 11L12 20" stroke={BRUTE.paper} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+        <path d="M12 2L2 11L12 20" stroke={BRUTE.text} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
       </svg>
     </button>
   );
@@ -104,21 +104,21 @@ function BackButton({ onClick }) {
 function CloseXButton({ onClick }) {
   return (
     <button onClick={onClick} className="brute-press brute-no-select"
-      style={{ background: 'transparent', border: 0, padding: 8, cursor: 'pointer', color: BRUTE.paper }}>
-      <svg width="22" height="22" viewBox="0 0 22 22"><path d="M4 4L18 18M18 4L4 18" stroke={BRUTE.paper} strokeWidth="2.2" strokeLinecap="round"/></svg>
+      style={{ background: 'transparent', border: 0, padding: 8, cursor: 'pointer', color: BRUTE.text }}>
+      <svg width="22" height="22" viewBox="0 0 22 22"><path d="M4 4L18 18M18 4L4 18" stroke={BRUTE.text} strokeWidth="2.2" strokeLinecap="round"/></svg>
     </button>
   );
 }
 
 // ─── Modal sheet (bottom, 70% height) ──────────────────────────────────────
-function Sheet({ open, onClose, title, children, height = '75%', tone = 'ink' }) {
+function Sheet({ open, onClose, title, children, height = '75%', tone = 'paper' }) {
   if (!open) return null;
-  const bg = tone === 'ink' ? BRUTE.ink : BRUTE.bone;
-  const fg = tone === 'ink' ? BRUTE.paper : BRUTE.ink;
+  const bg = tone === 'paper' ? BRUTE.surface : BRUTE.bg;
+  const fg = BRUTE.text;
   return (
     <div style={{ position: 'absolute', inset: 0, zIndex: 500 }}>
       <div onClick={onClose} style={{
-        position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.6)',
+        position: 'absolute', inset: 0, background: 'rgba(10,10,10,0.35)',
         animation: 'bruteFade 160ms ease-out',
       }}/>
       <div style={{
@@ -127,9 +127,10 @@ function Sheet({ open, onClose, title, children, height = '75%', tone = 'ink' })
         paddingBottom: 'env(safe-area-inset-bottom)',
         animation: 'bruteSlideUp 200ms ease-out',
         display: 'flex', flexDirection: 'column', overflow: 'hidden',
+        boxShadow: '0 -8px 24px rgba(10,10,10,0.12)',
       }}>
         <div style={{ padding: '12px 0', display: 'flex', justifyContent: 'center' }}>
-          <div style={{ width: 44, height: 4, background: tone === 'ink' ? BRUTE.smoke : BRUTE.ash, borderRadius: 2 }}/>
+          <div style={{ width: 44, height: 4, background: BRUTE.border, borderRadius: 2 }}/>
         </div>
         {title && (
           <div className="brute-display" style={{
@@ -155,9 +156,9 @@ function Stepper({ value, onChange, min = 0, max = 500, step = 2.5, onHaptic, un
       <button onClick={() => bump(-step)} className="brute-press brute-no-select"
         style={stepBtnStyle}>−</button>
       <div className="brute-mono" style={{
-        flex: 1, textAlign: 'center', color: BRUTE.paper,
+        flex: 1, textAlign: 'center', color: BRUTE.text,
         fontSize: big ? 44 : 28, fontWeight: 700, letterSpacing: '-0.02em',
-      }}>{value}<span style={{ color: BRUTE.ash, fontSize: big ? 18 : 13, marginLeft: 6 }}>{unit}</span></div>
+      }}>{value}<span style={{ color: BRUTE.textFaint, fontSize: big ? 18 : 13, marginLeft: 6 }}>{unit}</span></div>
       <button onClick={() => bump(step)} className="brute-press brute-no-select"
         style={stepBtnStyle}>+</button>
     </div>
@@ -165,8 +166,8 @@ function Stepper({ value, onChange, min = 0, max = 500, step = 2.5, onHaptic, un
 }
 const stepBtnStyle = {
   width: 48, height: 48, borderRadius: 12,
-  background: 'transparent', border: `1px solid ${BRUTE.smoke}`,
-  color: BRUTE.paper, fontFamily: "'Bebas Neue', Impact", fontSize: 28, fontWeight: 700,
+  background: 'transparent', border: `1px solid ${BRUTE.border}`,
+  color: BRUTE.text, fontFamily: "'Bebas Neue', Impact", fontSize: 28, fontWeight: 700,
   cursor: 'pointer',
 };
 
@@ -186,13 +187,13 @@ function RPEPicker({ value, onChange }) {
           <button key={n} onClick={() => onChange(n)}
             style={{
               flex: 1, aspectRatio: 1, border: 0, cursor: 'pointer',
-              background: value === n ? BRUTE.blood : BRUTE.smoke,
-              color: BRUTE.paper, borderRadius: 10,
+              background: value === n ? BRUTE.blood : BRUTE.surfaceAlt,
+              color: BRUTE.text, borderRadius: 10,
               fontFamily: "'Bebas Neue', Impact", fontSize: 28, fontWeight: 700,
             }}>{n}</button>
         ))}
       </div>
-      <div className="brute-caption" style={{ color: BRUTE.ash, marginTop: 10, textAlign: 'center' }}>
+      <div className="brute-caption" style={{ color: BRUTE.textFaint, marginTop: 10, textAlign: 'center' }}>
         {value != null ? `RPE ${value} — ${LABELS[value]}` : 'ВЫБЕРИ ОЦЕНКУ'}
       </div>
     </div>
@@ -220,9 +221,9 @@ function PlateCalc({ targetKg, barKg = 20, onBarChange }) {
   const res = computePlates(targetKg, barKg);
   return (
     <div>
-      <div className="brute-caption" style={{ color: BRUTE.ash }}>ЦЕЛЬ</div>
-      <div className="brute-mono" style={{ fontSize: 40, color: BRUTE.paper, fontWeight: 700 }}>
-        {targetKg}<span style={{ color: BRUTE.ash, fontSize: 18, marginLeft: 8 }}>КГ</span>
+      <div className="brute-caption" style={{ color: BRUTE.textFaint }}>ЦЕЛЬ</div>
+      <div className="brute-mono" style={{ fontSize: 40, color: BRUTE.text, fontWeight: 700 }}>
+        {targetKg}<span style={{ color: BRUTE.textFaint, fontSize: 18, marginLeft: 8 }}>КГ</span>
       </div>
 
       <div style={{ marginTop: 16, display: 'flex', gap: 8 }}>
@@ -230,14 +231,14 @@ function PlateCalc({ targetKg, barKg = 20, onBarChange }) {
           <button key={b} onClick={() => onBarChange && onBarChange(b)}
             style={{
               flex: 1, height: 44, border: 0,
-              background: barKg === b ? BRUTE.blood : BRUTE.smoke,
-              color: BRUTE.paper, borderRadius: 8,
+              background: barKg === b ? BRUTE.blood : BRUTE.surfaceAlt,
+              color: BRUTE.text, borderRadius: 8,
               fontFamily: "'Bebas Neue', Impact", fontSize: 18, cursor: 'pointer',
             }}>ГРИФ {b}КГ</button>
         ))}
       </div>
 
-      <div className="brute-caption" style={{ color: BRUTE.ash, marginTop: 20 }}>
+      <div className="brute-caption" style={{ color: BRUTE.textFaint, marginTop: 20 }}>
         НА КАЖДУЮ СТОРОНУ · {res.perSide || 0} КГ
       </div>
 
@@ -247,14 +248,14 @@ function PlateCalc({ targetKg, barKg = 20, onBarChange }) {
         <div style={{ marginTop: 10, display: 'flex', gap: 6, alignItems: 'flex-end', flexWrap: 'wrap' }}>
           {res.stack.map((p, i) => (
             <div key={i} style={{
-              background: BRUTE.blood, color: BRUTE.paper,
+              background: BRUTE.blood, color: BRUTE.text,
               padding: '12px 10px', borderRadius: 4,
               fontFamily: "'JetBrains Mono', monospace", fontSize: 16, fontWeight: 700,
               minWidth: 44, textAlign: 'center',
             }}>{p}</div>
           ))}
           {res.leftover > 0 && (
-            <div style={{ color: BRUTE.ash, marginLeft: 8, alignSelf: 'center' }}>
+            <div style={{ color: BRUTE.textFaint, marginLeft: 8, alignSelf: 'center' }}>
               + {res.leftover} кг не хватает
             </div>
           )}
@@ -275,7 +276,7 @@ function RestTimerRing({ seconds, total, color = BRUTE.blood }) {
   return (
     <div style={{ position: 'relative', width: 180, height: 180 }}>
       <svg width="180" height="180" viewBox="0 0 180 180" style={{ transform: 'rotate(-90deg)' }}>
-        <circle cx="90" cy="90" r={R} fill="none" stroke={BRUTE.smoke} strokeWidth="10"/>
+        <circle cx="90" cy="90" r={R} fill="none" stroke={BRUTE.border} strokeWidth="10"/>
         <circle cx="90" cy="90" r={R} fill="none" stroke={color}
           strokeWidth="10" strokeLinecap="butt"
           strokeDasharray={`${C}`} strokeDashoffset={`${offset}`}
@@ -285,10 +286,10 @@ function RestTimerRing({ seconds, total, color = BRUTE.blood }) {
         position: 'absolute', inset: 0, display: 'flex',
         alignItems: 'center', justifyContent: 'center', flexDirection: 'column',
       }}>
-        <div className="brute-mono" style={{ fontSize: 42, color: BRUTE.paper, fontWeight: 700 }}>
+        <div className="brute-mono" style={{ fontSize: 42, color: BRUTE.text, fontWeight: 700 }}>
           {mm}:{ss}
         </div>
-        <div className="brute-caption" style={{ color: BRUTE.ash, marginTop: 2 }}>ОТДЫХ</div>
+        <div className="brute-caption" style={{ color: BRUTE.textFaint, marginTop: 2 }}>ОТДЫХ</div>
       </div>
     </div>
   );

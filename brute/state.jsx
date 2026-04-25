@@ -4,7 +4,7 @@
 const BRUTE_STORE_KEY = 'brute:v1';
 
 const INITIAL_STATE = {
-  v: 1,
+  v: 2,
   profile: {
     onboarded: false,
     name: '',
@@ -16,12 +16,15 @@ const INITIAL_STATE = {
     lang: 'ru',
     soundPack: 'machineshop', // 'machineshop' | 'silent'
     hapticsOn: true,
-    theme: 'ink',
+    theme: 'light',
+    cleanSinceISO: null, // ISO date when sobriety counter started; null = not tracked
     createdAtISO: null,
   },
   sessions: [],       // LoggedSession[]
   prs: [],            // PRRecord[]
   bodyweight: [],     // BodyweightEntry[]
+  moodLog: [],        // [{ dateISO, score: 1..5, note: '' }]
+  cleanRelapses: [],  // [{ dateISO, prevSinceISO }] — history of resets
   activeSession: null, // { templateKey, startedAt, currentIdx, currentSetIdx, loggedSets[], restStartedAt, restDurationSec }
 };
 
@@ -35,6 +38,8 @@ function loadState() {
     parsed.sessions = parsed.sessions || [];
     parsed.prs = parsed.prs || [];
     parsed.bodyweight = parsed.bodyweight || [];
+    parsed.moodLog = parsed.moodLog || [];
+    parsed.cleanRelapses = parsed.cleanRelapses || [];
     parsed.activeSession = parsed.activeSession || null;
     return parsed;
   } catch (e) {
@@ -235,6 +240,34 @@ function BruteProvider({ children }) {
       setState(INITIAL_STATE);
     },
 
+    // ── Sobriety + mood ──
+    setCleanSince(isoOrNull) {
+      setState((s) => ({ ...s, profile: { ...s.profile, cleanSinceISO: isoOrNull } }));
+    },
+
+    relapse() {
+      setState((s) => {
+        const todayISO = dateToISO(new Date());
+        const prev = s.profile.cleanSinceISO;
+        return {
+          ...s,
+          profile: { ...s.profile, cleanSinceISO: todayISO },
+          cleanRelapses: [...(s.cleanRelapses || []), { dateISO: todayISO, prevSinceISO: prev }],
+        };
+      });
+    },
+
+    logMood(score, note = '') {
+      setState((s) => {
+        const todayISO = dateToISO(new Date());
+        const existing = (s.moodLog || []).filter((m) => m.dateISO !== todayISO);
+        return {
+          ...s,
+          moodLog: [...existing, { dateISO: todayISO, score, note, timestamp: Date.now() }],
+        };
+      });
+    },
+
     exportJSON() {
       return JSON.stringify(state, null, 2);
     },
@@ -306,8 +339,29 @@ function bestOneRMs(prs, profile) {
   return out;
 }
 
+// ── Sobriety helpers ──
+function daysClean(cleanSinceISO, todayISO) {
+  if (!cleanSinceISO) return 0;
+  return Math.max(0, daysBetween(cleanSinceISO, todayISO));
+}
+
+function todayMood(moodLog, todayISO) {
+  return (moodLog || []).find((m) => m.dateISO === todayISO) || null;
+}
+
+function moodAverage(moodLog, days = 7, todayISO) {
+  if (!moodLog || moodLog.length === 0) return 0;
+  const today = isoToDate(todayISO);
+  const cutoff = new Date(today.getFullYear(), today.getMonth(), today.getDate() - days);
+  const cutoffISO = dateToISO(cutoff);
+  const recent = moodLog.filter((m) => m.dateISO >= cutoffISO);
+  if (recent.length === 0) return 0;
+  return recent.reduce((a, m) => a + m.score, 0) / recent.length;
+}
+
 Object.assign(window, {
   BRUTE_STORE_KEY, INITIAL_STATE,
   loadState, saveState, BruteCtx, BruteProvider, useBrute,
   computeStreak, sessionsByWeek, bestOneRMs,
+  daysClean, todayMood, moodAverage,
 });

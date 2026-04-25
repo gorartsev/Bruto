@@ -33,24 +33,28 @@ function BruteDivider({ color = BRUTE.ink, width = '100%', opacity = 1 }) {
 }
 
 function BruteCard({ tone = 'bone', children, style = {}, grit = 2, padding = 20, radius = 24 }) {
-  const bg = tone === 'bone' ? BRUTE.bone : tone === 'ink' ? BRUTE.ink : BRUTE.smoke;
-  const fg = tone === 'bone' ? BRUTE.ink  : BRUTE.paper;
+  // In light theme: bone tone = primary cream card; ink/smoke tones map to white/alt cards.
+  const bg = tone === 'bone' ? BRUTE.surface
+           : tone === 'ink'  ? BRUTE.bone
+                             : BRUTE.surfaceAlt;
+  const fg = BRUTE.text;
   return (
     <div style={{
       background: bg, color: fg,
       borderRadius: radius, padding,
       position: 'relative', overflow: 'hidden',
+      border: tone === 'bone' ? `1px solid ${BRUTE.separator}` : 'none',
       ...style,
     }}>
       {grit > 0 && (
         <div style={{
           position: 'absolute', inset: 0, pointerEvents: 'none',
-          backgroundImage: halftoneBg(tone === 'bone' ? '#000' : '#fff', grit === 3 ? 2 : 1),
-          opacity: tone === 'bone' ? 0.5 : 0.3,
-          mixBlendMode: tone === 'bone' ? 'multiply' : 'screen',
+          backgroundImage: halftoneBg('#000', grit === 3 ? 2 : 1),
+          opacity: 0.4,
+          mixBlendMode: 'multiply',
         }} />
       )}
-      {grit >= 2 && tone === 'bone' && (
+      {grit >= 2 && (
         <div style={{
           position: 'absolute', inset: 0, pointerEvents: 'none',
           backgroundImage: PAPER_NOISE,
@@ -133,8 +137,8 @@ function WeightDrum({ value, onChange, min = 20, max = 300, step = 2.5, onHaptic
   return (
     <div style={{
       position: 'relative', width: 140, height: ITEM_H * 3,
-      background: BRUTE.ink, borderRadius: 12, overflow: 'hidden',
-      border: `1px solid ${BRUTE.smoke}`,
+      background: BRUTE.surface, borderRadius: 12, overflow: 'hidden',
+      border: `1px solid ${BRUTE.border}`,
     }}>
       {/* center highlight band */}
       <div style={{
@@ -147,7 +151,7 @@ function WeightDrum({ value, onChange, min = 20, max = 300, step = 2.5, onHaptic
       {/* fade mask */}
       <div style={{
         position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 3,
-        background: `linear-gradient(to bottom, ${BRUTE.ink} 0%, transparent 30%, transparent 70%, ${BRUTE.ink} 100%)`,
+        background: `linear-gradient(to bottom, ${BRUTE.surface} 0%, transparent 30%, transparent 70%, ${BRUTE.surface} 100%)`,
       }}/>
       <div ref={listRef} onScroll={onScroll}
            style={{
@@ -161,7 +165,7 @@ function WeightDrum({ value, onChange, min = 20, max = 300, step = 2.5, onHaptic
           <div key={v} className="brute-mono" style={{
             height: ITEM_H, display: 'flex', alignItems: 'center', justifyContent: 'center',
             scrollSnapAlign: 'center',
-            color: v === value ? BRUTE.paper : BRUTE.ash,
+            color: v === value ? BRUTE.text : BRUTE.textFaint,
             fontFamily: "'JetBrains Mono', monospace",
             fontSize: v === value ? 28 : 18,
             fontWeight: v === value ? 700 : 400,
@@ -181,7 +185,7 @@ function StreakBadge({ count }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
       <FlashFlame size={22} color={BRUTE.blood}/>
-      <span className="brute-display" style={{ fontSize: 24, color: BRUTE.paper, letterSpacing: 0 }}>{count}</span>
+      <span className="brute-display" style={{ fontSize: 24, color: BRUTE.text, letterSpacing: 0 }}>{count}</span>
     </div>
   );
 }
@@ -189,18 +193,19 @@ function StreakBadge({ count }) {
 // Bottom tab bar
 function BruteTabBar({ active = 'today', onChange }) {
   const tabs = [
-    { id: 'today', label: 'TODAY' },
-    { id: 'program', label: 'PROGRAM' },
-    { id: 'log', label: 'LOG' },
-    { id: 'stats', label: 'STATS' },
-    { id: 'profile', label: 'PROFILE' },
+    { id: 'today',   label: 'ДЕНЬ' },
+    { id: 'program', label: 'ПРОГ.' },
+    { id: 'log',     label: 'ЖУРН.' },
+    { id: 'days',    label: 'ДНИ' },
+    { id: 'stats',   label: 'СТАТС' },
+    { id: 'profile', label: 'ПРОФ.' },
   ];
   return (
     <div style={{
       position: 'absolute', left: 0, right: 0, bottom: 0,
-      background: BRUTE.ink,
+      background: BRUTE.surface,
       paddingTop: 10, paddingBottom: 34,
-      borderTop: `1px solid ${BRUTE.smoke}`,
+      borderTop: `1px solid ${BRUTE.separator}`,
       display: 'flex', justifyContent: 'space-around',
       zIndex: 40,
     }}>
@@ -215,7 +220,7 @@ function BruteTabBar({ active = 'today', onChange }) {
             }}>
             <TabIcon id={t.id} active={isActive} />
             <span className="brute-caption" style={{
-              color: isActive ? BRUTE.paper : BRUTE.ash,
+              color: isActive ? BRUTE.text : BRUTE.textFaint,
               fontSize: 9, marginTop: 3,
             }}>{t.label}</span>
             {isActive && (
@@ -232,7 +237,7 @@ function BruteTabBar({ active = 'today', onChange }) {
 }
 
 function TabIcon({ id, active }) {
-  const c = active ? BRUTE.paper : BRUTE.ash;
+  const c = active ? BRUTE.text : BRUTE.textFaint;
   const S = { stroke: c, strokeWidth: 2, fill: 'none', strokeLinecap: 'round', strokeLinejoin: 'round' };
   const size = 22;
   if (id === 'today') {
@@ -243,6 +248,9 @@ function TabIcon({ id, active }) {
   }
   if (id === 'log') {
     return <svg width={size} height={size} viewBox="0 0 22 22"><path d="M4 4h14v14H4zM7 8h8M7 11h8M7 14h5" {...S}/></svg>;
+  }
+  if (id === 'days') {
+    return <svg width={size} height={size} viewBox="0 0 22 22"><circle cx="11" cy="11" r="7" {...S}/><circle cx="8" cy="9" r="0.8" fill={c}/><circle cx="14" cy="9" r="0.8" fill={c}/><path d="M8 14 Q 11 16 14 14" {...S}/></svg>;
   }
   if (id === 'stats') {
     return <svg width={size} height={size} viewBox="0 0 22 22"><path d="M3 18L8 12L12 15L19 5" {...S}/><circle cx="19" cy="5" r="2" fill={c} stroke="none"/></svg>;

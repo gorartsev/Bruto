@@ -67,6 +67,8 @@ function BruteApp({ mobile = true }) {
           onOpenSession={(coords) => setProgramSheetSession(coords)}/>;
       case 'log':
         return <LogbookScreen onOpenSession={(s) => setLogbookSheetSession(s)}/>;
+      case 'days':
+        return <CleanDaysScreen/>;
       case 'stats':
         return <StatsScreen/>;
       case 'profile':
@@ -122,25 +124,25 @@ function ProgramSessionSheet({ coords, onClose, onStart }) {
 
   return (
     <Sheet open={true} onClose={onClose} title={session.theme} height="80%">
-      <div className="brute-caption" style={{ color: BRUTE.ash, marginBottom: 6 }}>
+      <div className="brute-caption" style={{ color: BRUTE.textFaint, marginBottom: 6 }}>
         НЕДЕЛЯ {String(coords.week).padStart(2,'0')} · {WEEKDAY_NAMES_RU[coords.weekday]} · ФАЗА {coords.phase}
       </div>
-      <div className="brute-display" style={{ color: BRUTE.paper, fontSize: 18, marginBottom: 16 }}>
+      <div className="brute-display" style={{ color: BRUTE.text, fontSize: 18, marginBottom: 16 }}>
         {session.subtheme}
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
         {session.exercises.map((ex, i) => (
           <div key={i} style={{
-            padding: '10px 12px', background: BRUTE.smoke, borderRadius: 8,
+            padding: '10px 12px', background: BRUTE.surfaceAlt, borderRadius: 8,
             display: 'flex', alignItems: 'center', gap: 10,
           }}>
-            <ExerciseArt exerciseKey={ex.ex} size={40} color={BRUTE.paper}/>
+            <ExerciseArt exerciseKey={ex.ex} size={40} color={BRUTE.text}/>
             <div style={{ flex: 1 }}>
-              <div className="brute-display" style={{ color: BRUTE.paper, fontSize: 14, letterSpacing: '0.02em' }}>{ex.exDef.name}</div>
-              {ex.note && <div className="brute-caption" style={{ color: BRUTE.ash, fontSize: 9, marginTop: 2 }}>{ex.note}</div>}
+              <div className="brute-display" style={{ color: BRUTE.text, fontSize: 14, letterSpacing: '0.02em' }}>{ex.exDef.name}</div>
+              {ex.note && <div className="brute-caption" style={{ color: BRUTE.textFaint, fontSize: 9, marginTop: 2 }}>{ex.note}</div>}
             </div>
-            <div className="brute-mono" style={{ color: BRUTE.paper, fontSize: 13, fontWeight: 600 }}>
+            <div className="brute-mono" style={{ color: BRUTE.text, fontSize: 13, fontWeight: 600 }}>
               {ex.prescribedKg > 0 ? `${ex.prescribedKg} × ${ex.sets}/${ex.reps}${ex.amrap ? '+' : ''}` : `${ex.sets}×${ex.reps}`}
             </div>
           </div>
@@ -161,24 +163,24 @@ function ProgramSessionSheet({ coords, onClose, onStart }) {
 function LogbookSessionSheet({ session, onClose }) {
   return (
     <Sheet open={true} onClose={onClose} title={session.theme} height="80%">
-      <div className="brute-caption" style={{ color: BRUTE.ash, marginBottom: 14 }}>
+      <div className="brute-caption" style={{ color: BRUTE.textFaint, marginBottom: 14 }}>
         {formatShort(session.dateISO)} · {Math.round(session.durationSec / 60)} МИН · {Math.round(session.totalVolumeKg)} КГ
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
         {groupByExercise(session.loggedSets || []).map((grp, i) => (
-          <div key={i} style={{ background: BRUTE.smoke, borderRadius: 8, padding: '12px 14px' }}>
+          <div key={i} style={{ background: BRUTE.surfaceAlt, borderRadius: 8, padding: '12px 14px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <ExerciseArt exerciseKey={grp.key} size={36} color={BRUTE.paper}/>
-              <div className="brute-display" style={{ color: BRUTE.paper, fontSize: 16, letterSpacing: '0.02em' }}>
+              <ExerciseArt exerciseKey={grp.key} size={36} color={BRUTE.text}/>
+              <div className="brute-display" style={{ color: BRUTE.text, fontSize: 16, letterSpacing: '0.02em' }}>
                 {EXERCISES[grp.key]?.name || grp.key}
               </div>
             </div>
             <div style={{ marginTop: 6, display: 'flex', flexDirection: 'column', gap: 3 }}>
               {grp.sets.map((ls, si) => (
                 <div key={si} style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <span className="brute-caption" style={{ color: BRUTE.ash }}>ПОДХОД {ls.setIdx + 1}</span>
-                  <span className="brute-mono" style={{ color: BRUTE.paper, fontSize: 13 }}>
+                  <span className="brute-caption" style={{ color: BRUTE.textFaint }}>ПОДХОД {ls.setIdx + 1}</span>
+                  <span className="brute-mono" style={{ color: BRUTE.text, fontSize: 13 }}>
                     {ls.actualWeightKg}кг × {ls.actualReps}
                     {ls.rpe ? ` · RPE ${ls.rpe}` : ''}
                     {ls.formBreak ? ' · СРЫВ' : ''}
@@ -193,7 +195,7 @@ function LogbookSessionSheet({ session, onClose }) {
       {(session.prs || []).length > 0 && (
         <div style={{ marginTop: 16, padding: 14, border: `1px solid ${BRUTE.blood}`, borderRadius: 10 }}>
           <div className="brute-caption" style={{ color: BRUTE.blood }}>★ РЕКОРДЫ ЭТОЙ ТРЕНИРОВКИ</div>
-          <div style={{ marginTop: 4, color: BRUTE.paper }}>
+          <div style={{ marginTop: 4, color: BRUTE.text }}>
             {session.prs.map((l) => liftNameRu(l)).join(' · ')}
           </div>
         </div>
