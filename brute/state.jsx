@@ -4,7 +4,7 @@
 const BRUTE_STORE_KEY = 'brute:v1';
 
 const INITIAL_STATE = {
-  v: 2,
+  v: 3,
   profile: {
     onboarded: false,
     name: '',
@@ -14,19 +14,25 @@ const INITIAL_STATE = {
     estimatedOneRM: { squat: 70, bench: 75, deadlift: 90, ohp: 45, pullup: 0 },
     trainingMax: { squat: 60, bench: 63, deadlift: 76, ohp: 38 },
     lang: 'ru',
-    soundPack: 'machineshop', // 'machineshop' | 'silent'
+    soundPack: 'machineshop',
     hapticsOn: true,
     theme: 'light',
-    cleanSinceISO: null, // ISO date when sobriety counter started; null = not tracked
+    cleanSinceISO: null,
+    cleanReasons: [],         // ["Девушка", "Спорт", "Деньги", ...]
+    dailyCostRub: 0,           // for money-saved counter (0 = disabled)
     createdAtISO: null,
   },
-  sessions: [],       // LoggedSession[]
-  prs: [],            // PRRecord[]
-  bodyweight: [],     // BodyweightEntry[]
-  moodLog: [],        // [{ dateISO, score: 1..5, note: '' }]
-  relapseDates: [],   // [dateISO] — explicit list of days marked as relapse (sorted)
-  cleanRelapses: [],  // [{ dateISO, prevSinceISO }] — legacy reset history (kept for compat)
-  activeSession: null, // { templateKey, startedAt, currentIdx, currentSetIdx, loggedSets[], restStartedAt, restDurationSec }
+  sessions: [],
+  prs: [],
+  bodyweight: [],
+  moodLog: [],
+  relapseDates: [],
+  cleanRelapses: [],
+  urgeLog: [],                  // [{ id, timestamp, dateISO, trigger?, action?, resolved: bool }]
+  letters: [],                  // [{ id, writtenAtISO, openOnDay, body, opened: bool, openedAtISO? }]
+  photoJournal: [],             // [{ id, dateISO, dataUrl, note? }]
+  weeklyReviewsSeen: [],        // [weekStartISO]
+  activeSession: null,
 };
 
 function loadState() {
@@ -41,10 +47,15 @@ function loadState() {
     parsed.bodyweight = parsed.bodyweight || [];
     parsed.moodLog = parsed.moodLog || [];
     parsed.cleanRelapses = parsed.cleanRelapses || [];
-    // migrate legacy cleanRelapses → relapseDates if not yet set
     if (!parsed.relapseDates) {
       parsed.relapseDates = (parsed.cleanRelapses || []).map((r) => r.dateISO);
     }
+    parsed.urgeLog = parsed.urgeLog || [];
+    parsed.letters = parsed.letters || [];
+    parsed.photoJournal = parsed.photoJournal || [];
+    parsed.weeklyReviewsSeen = parsed.weeklyReviewsSeen || [];
+    parsed.profile.cleanReasons = parsed.profile.cleanReasons || [];
+    parsed.profile.dailyCostRub = parsed.profile.dailyCostRub || 0;
     parsed.activeSession = parsed.activeSession || null;
     return parsed;
   } catch (e) {
@@ -297,6 +308,86 @@ function BruteProvider({ children }) {
       });
     },
 
+    // ── Reasons + cost ──
+    setCleanReasons(arr) {
+      setState((s) => ({ ...s, profile: { ...s.profile, cleanReasons: arr } }));
+    },
+    setDailyCost(rub) {
+      setState((s) => ({ ...s, profile: { ...s.profile, dailyCostRub: rub } }));
+    },
+
+    // ── Urge log ──
+    logUrge({ trigger, action, resolved }) {
+      setState((s) => {
+        const u = {
+          id: 'urge-' + Date.now(),
+          timestamp: Date.now(),
+          dateISO: dateToISO(new Date()),
+          trigger: trigger || '',
+          action: action || '',
+          resolved: !!resolved,
+        };
+        return { ...s, urgeLog: [...(s.urgeLog || []), u] };
+      });
+    },
+
+    resolveUrge(id, resolved = true) {
+      setState((s) => ({
+        ...s,
+        urgeLog: (s.urgeLog || []).map((u) => u.id === id ? { ...u, resolved } : u),
+      }));
+    },
+
+    // ── Letters ──
+    writeLetter({ openOnDay, body }) {
+      setState((s) => {
+        const l = {
+          id: 'letter-' + Date.now(),
+          writtenAtISO: dateToISO(new Date()),
+          openOnDay,    // day-of-clean to unlock (e.g. 30, 90, 365)
+          body,
+          opened: false,
+        };
+        return { ...s, letters: [...(s.letters || []), l] };
+      });
+    },
+
+    openLetter(id) {
+      setState((s) => ({
+        ...s,
+        letters: (s.letters || []).map((l) => l.id === id ? { ...l, opened: true, openedAtISO: dateToISO(new Date()) } : l),
+      }));
+    },
+
+    deleteLetter(id) {
+      setState((s) => ({ ...s, letters: (s.letters || []).filter((l) => l.id !== id) }));
+    },
+
+    // ── Photo journal ──
+    addPhoto({ dataUrl, note }) {
+      setState((s) => {
+        const p = {
+          id: 'photo-' + Date.now(),
+          dateISO: dateToISO(new Date()),
+          dataUrl,
+          note: note || '',
+        };
+        return { ...s, photoJournal: [...(s.photoJournal || []), p] };
+      });
+    },
+
+    deletePhoto(id) {
+      setState((s) => ({ ...s, photoJournal: (s.photoJournal || []).filter((p) => p.id !== id) }));
+    },
+
+    // ── Weekly review ──
+    markWeekReviewed(weekStartISO) {
+      setState((s) => ({
+        ...s,
+        weeklyReviewsSeen: [...new Set([...(s.weeklyReviewsSeen || []), weekStartISO])],
+      }));
+    },
+
     exportJSON() {
       return JSON.stringify(state, null, 2);
     },
@@ -429,9 +520,72 @@ function moodAverage(moodLog, days = 7, todayISO) {
   return recent.reduce((a, m) => a + m.score, 0) / recent.length;
 }
 
+// ── Money saved ──
+function moneySaved(profile, todayISO, relapseDates) {
+  const days = daysClean(profile.cleanSinceISO, todayISO, relapseDates);
+  return Math.max(0, days * (profile.dailyCostRub || 0));
+}
+
+// ── Letter unlock check ──
+function unlockedLetters(letters, currentDays) {
+  return (letters || []).filter((l) => !l.opened && currentDays >= l.openOnDay);
+}
+
+// ── Tombstone unlock list ──
+const TOMBSTONE_MILESTONES = [30, 60, 90, 180, 365, 730, 1000];
+function tombstonesEarned(currentDays) {
+  return TOMBSTONE_MILESTONES.filter((m) => currentDays >= m);
+}
+
+// ── Strength standards (per Lon Kilgore tables, kg / kg bodyweight) ──
+// rough thresholds used in competitive lifting circles
+const STRENGTH_STANDARDS = {
+  // multiples of bodyweight (male intermediate-level proxies)
+  squat:    { novice: 0.8, intermediate: 1.25, advanced: 1.75, elite: 2.25 },
+  bench:    { novice: 0.6, intermediate: 1.0,  advanced: 1.4,  elite: 1.75 },
+  deadlift: { novice: 1.0, intermediate: 1.5,  advanced: 2.0,  elite: 2.5  },
+  ohp:      { novice: 0.4, intermediate: 0.65, advanced: 0.9,  elite: 1.15 },
+};
+function strengthLevel(lift, oneRMKg, bwKg) {
+  if (!oneRMKg || !bwKg) return { ratio: 0, level: 'НЕТ ДАННЫХ' };
+  const r = oneRMKg / bwKg;
+  const t = STRENGTH_STANDARDS[lift];
+  if (!t) return { ratio: r, level: '—' };
+  const level = r >= t.elite ? 'ЭЛИТА'
+              : r >= t.advanced ? 'ПРОДВИНУТЫЙ'
+              : r >= t.intermediate ? 'СРЕДНИЙ'
+              : r >= t.novice ? 'НАЧИНАЮЩИЙ'
+              : 'НИЖЕ НОВИЧКА';
+  return { ratio: r, level };
+}
+
+// ── Sunday detection ──
+function lastSundayISO(todayISO) {
+  const d = isoToDate(todayISO);
+  // 0=Sun, 1=Mon..6=Sat
+  const dow = d.getDay();
+  // last Sunday on or before today (today if Sun)
+  const offset = dow; // days since Sunday
+  const sun = new Date(d.getFullYear(), d.getMonth(), d.getDate() - offset);
+  return dateToISO(sun);
+}
+
+// Get the Monday of the week we just finished (last week's Mon → Sun cycle).
+function lastWeekStartISO(todayISO) {
+  const d = isoToDate(todayISO);
+  const dow = d.getDay();   // 0=Sun..6=Sat
+  // we want last week's Monday — i.e. 6 days before "this past Sunday" if today is Sun, else more
+  const offsetToLastSun = dow;          // days since Sunday-just-passed (0 if today=Sun)
+  const lastSun = new Date(d.getFullYear(), d.getMonth(), d.getDate() - offsetToLastSun);
+  const lastMon = new Date(lastSun.getFullYear(), lastSun.getMonth(), lastSun.getDate() - 6);
+  return dateToISO(lastMon);
+}
+
 Object.assign(window, {
   BRUTE_STORE_KEY, INITIAL_STATE,
   loadState, saveState, BruteCtx, BruteProvider, useBrute,
   computeStreak, sessionsByWeek, bestOneRMs,
   daysClean, todayMood, moodAverage, dayStatus, longestStreak,
+  moneySaved, unlockedLetters, TOMBSTONE_MILESTONES, tombstonesEarned,
+  STRENGTH_STANDARDS, strengthLevel, lastSundayISO, lastWeekStartISO,
 });

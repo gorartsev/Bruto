@@ -181,7 +181,50 @@ function FlashPlaceholder({ size = 120, label = 'FLASH', tone = 'ink' }) {
   );
 }
 
+// ─── Mini tombstone for milestone gallery (compact) ────────────────────────
+function FlashMiniTombstone({ size = 80, color = '#0A0A0A', days = 30, dateISO = '' }) {
+  const S = { stroke: color, strokeWidth: 2, fill: 'none', strokeLinecap: 'round', strokeLinejoin: 'round' };
+  // Variant by milestone: skull at 90+, fancy crown at 365+, simple cross by default
+  const isBig = days >= 365;
+  const isMid = days >= 90 && days < 365;
+  return (
+    <svg width={size} height={size} viewBox="0 0 100 100">
+      {/* ground */}
+      <path d="M10,86 C30,84 60,88 90,84" {...S} strokeWidth="1.4"/>
+      {/* stone */}
+      <path d="M28,86 L28,40 C28,26 38,16 50,16 C62,16 72,26 72,40 L72,86 Z"
+            {...S} fill={color} fillOpacity="0.08"/>
+      {/* top emblem */}
+      {isBig ? (
+        // crown
+        <path d="M40,28 L44,22 L50,30 L56,22 L60,28 L60,32 L40,32 Z" stroke={color} strokeWidth="1.5" fill={color}/>
+      ) : isMid ? (
+        // skull
+        <>
+          <ellipse cx="50" cy="28" rx="7" ry="6" {...S} strokeWidth="1.5"/>
+          <circle cx="47.5" cy="28" r="1.2" fill={color}/>
+          <circle cx="52.5" cy="28" r="1.2" fill={color}/>
+        </>
+      ) : (
+        // cross
+        <path d="M50,22 L50,32 M45,27 L55,27" stroke={color} strokeWidth="1.6" fill="none" strokeLinecap="round"/>
+      )}
+      {/* big number */}
+      <text x="50" y="56" textAnchor="middle" fontFamily="'Bebas Neue', Impact, sans-serif"
+            fontSize="22" fontWeight="700" fill={color} letterSpacing="0.5">{days}</text>
+      <path d="M32,62 L68,62" stroke={color} strokeWidth="0.8" fill="none"/>
+      {/* dn label */}
+      <text x="50" y="74" textAnchor="middle" fontFamily="'Inter', sans-serif"
+            fontSize="6" fill={color} letterSpacing="1.5">ДНЕЙ ЧИСТЫЙ</text>
+      {dateISO && (
+        <text x="50" y="82" textAnchor="middle" fontFamily="'Inter', sans-serif"
+              fontSize="5" fill={color} letterSpacing="1" opacity="0.7">{dateISO}</text>
+      )}
+    </svg>
+  );
+}
+
 Object.assign(window, {
-  FlashSkull, FlashHeart, FlashTombstone, FlashMedallion,
+  FlashSkull, FlashHeart, FlashTombstone, FlashMiniTombstone, FlashMedallion,
   FlashBarbell, FlashFlame, FlashPlates, FlashPlaceholder,
 });

@@ -236,6 +236,55 @@ function StatsScreen() {
           </BruteCard>
         </div>
 
+        {/* Strength × bodyweight */}
+        <div style={{ marginTop: 14 }}>
+          <BruteCard tone="bone" padding={18} grit={1}>
+            <div className="brute-caption" style={{ color: BRUTE.bruise }}>СИЛА × ВЕС ТЕЛА</div>
+            <div className="brute-caption" style={{ color: BRUTE.textFaint, fontSize: 9, marginTop: 2 }}>
+              ВЕС ТЕЛА · {profile.bodyweightKg} КГ
+            </div>
+            <div style={{ marginTop: 10, display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {['squat','bench','deadlift','ohp'].map((k) => {
+                const oneRM = best[k] || 0;
+                const { ratio, level } = strengthLevel(k, oneRM, profile.bodyweightKg);
+                const tier = level === 'ЭЛИТА' ? 4
+                           : level === 'ПРОДВИНУТЫЙ' ? 3
+                           : level === 'СРЕДНИЙ' ? 2
+                           : level === 'НАЧИНАЮЩИЙ' ? 1 : 0;
+                const tierColor = tier >= 4 ? BRUTE.blood
+                                : tier === 3 ? '#7A0C12'
+                                : tier === 2 ? BRUTE.text
+                                : tier === 1 ? BRUTE.textFaint
+                                : BRUTE.textFaint;
+                return (
+                  <div key={k} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                        <span className="brute-display" style={{ color: BRUTE.text, fontSize: 14 }}>{liftNameRu(k)}</span>
+                        <span className="brute-mono" style={{ color: tierColor, fontSize: 16, fontWeight: 700 }}>
+                          {ratio > 0 ? `${ratio.toFixed(2)}\u00d7` : '—'}
+                        </span>
+                      </div>
+                      <div style={{ marginTop: 4, height: 6, background: BRUTE.surfaceAlt, borderRadius: 3, overflow: 'hidden' }}>
+                        <div style={{
+                          width: `${Math.min(100, (tier / 4) * 100)}%`, height: '100%',
+                          background: tierColor, transition: 'width 400ms',
+                        }}/>
+                      </div>
+                      <div className="brute-caption" style={{ color: BRUTE.textFaint, fontSize: 9, marginTop: 2 }}>
+                        {level}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+            <div className="brute-caption" style={{ color: BRUTE.textFaint, fontSize: 9, marginTop: 12, lineHeight: 1.5 }}>
+              УРОВНИ ОТНОСИТЕЛЬНО ВЕСА ТЕЛА: НОВИЧОК / СРЕДНИЙ / ПРОДВИНУТЫЙ / ЭЛИТА.
+            </div>
+          </BruteCard>
+        </div>
+
         {/* Volume per week */}
         <div style={{ marginTop: 14 }}>
           <BruteCard tone="ink" padding={16} grit={1} style={{ border: `1px solid ${BRUTE.border}` }}>

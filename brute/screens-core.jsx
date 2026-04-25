@@ -137,14 +137,19 @@ const onbInput = {
 
 // ─── TODAY ──────────────────────────────────────────────────────────────────
 function TodayScreenApp({ onStartSession, onOpenLog }) {
-  const { state } = useBrute();
+  const { state, actions } = useBrute();
   const todayISO = useTodayISO();
-  const { profile, sessions, prs } = state;
+  const { profile, sessions, prs, moodLog, relapseDates, weeklyReviewsSeen } = state;
 
   const today = getTodaySession(profile, sessions, todayISO);
   const streak = computeStreak(sessions, profile.startDateISO);
   const bestRM = bestOneRMs(prs, profile);
   const coords = today.coords || {};
+
+  // Sunday review trigger: if today is Sun/Mon and we haven't shown last week's review yet
+  const lastWeekMon = lastWeekStartISO(todayISO);
+  const dow = isoToDate(todayISO).getDay();
+  const showReview = (dow === 0 || dow === 1) && !(weeklyReviewsSeen || []).includes(lastWeekMon);
 
   const weekHeader = today.kind === 'before'
     ? `СТАРТ · ${formatShort(profile.startDateISO)}`
@@ -166,6 +171,17 @@ function TodayScreenApp({ onStartSession, onOpenLog }) {
           {streak > 0 && <StreakBadge count={streak}/>}
         </div>
         <div className="brute-caption" style={{ color: BRUTE.textFaint, marginTop: 4 }}>{weekHeader}</div>
+
+        {/* Sunday weekly review */}
+        {showReview && (
+          <WeeklyReviewCard
+            weekStartISO={lastWeekMon}
+            sessions={sessions}
+            moodLog={moodLog}
+            relapseDates={relapseDates}
+            cleanSinceISO={profile.cleanSinceISO}
+            onClose={() => actions.markWeekReviewed(lastWeekMon)}/>
+        )}
 
         {/* Main content by state */}
         {today.kind === 'before' && <BeforeStartCard startISO={profile.startDateISO}/>}
@@ -195,6 +211,84 @@ function TodayScreenApp({ onStartSession, onOpenLog }) {
 
 function liftNameRu(k) {
   return { squat: 'ПРИСЕД', bench: 'ЖИМ', deadlift: 'ТЯГА', ohp: 'ЖИМ СТОЯ', pullup: 'ПОДТЯГ.' }[k] || k.toUpperCase();
+}
+
+// ─── Weekly review card (Sunday/Monday on TODAY) ───────────────────────────
+function WeeklyReviewCard({ weekStartISO, sessions, moodLog, relapseDates, cleanSinceISO, onClose }) {
+  // compute stats for [weekStart, weekStart+6]
+  const start = isoToDate(weekStartISO);
+  const days = Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i);
+    return dateToISO(d);
+  });
+  const lastDayISO = days[6];
+
+  // sessions in this week
+  const weekSessions = (sessions || []).filter((s) => days.includes(s.dateISO));
+  const totalVolume = weekSessions.reduce((acc, s) => acc + (s.totalVolumeKg || 0), 0);
+  const sets = weekSessions.reduce((acc, s) => acc + (s.loggedSets || []).length, 0);
+  const prsThisWeek = weekSessions.reduce((acc, s) => acc + (s.prs || []).length, 0);
+
+  // mood
+  const weekMoods = (moodLog || []).filter((m) => days.includes(m.dateISO));
+  const moodAvg = weekMoods.length === 0 ? 0 : weekMoods.reduce((a, m) => a + m.score, 0) / weekMoods.length;
+
+  // clean days (only count days within cleanSince range)
+  const cleanCount = cleanSinceISO ? days.filter((iso) =>
+    iso >= cleanSinceISO && iso <= lastDayISO && !(relapseDates || []).includes(iso)
+  ).length : 0;
+
+  return (
+    <div style={{ marginTop: 16 }}>
+      <BruteCard tone="bone" padding={20} grit={2}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+          <div className="brute-caption" style={{ color: BRUTE.bruise }}>★ ИТОГИ НЕДЕЛИ</div>
+          <button onClick={onClose} style={{
+            background: 'transparent', border: 0, color: BRUTE.textFaint, cursor: 'pointer',
+            fontFamily: "'Bebas Neue', Impact", fontSize: 13, padding: 0,
+          }}>СКРЫТЬ</button>
+        </div>
+        <div className="brute-display" style={{
+          fontSize: 32, lineHeight: 0.95, color: BRUTE.text, marginTop: 4, letterSpacing: '-0.02em',
+        }}>
+          НЕДЕЛЯ ЗАКРЫТА.
+        </div>
+        <div className="brute-caption" style={{ color: BRUTE.textFaint, marginTop: 4 }}>
+          {formatShort(weekStartISO)} → {formatShort(lastDayISO)}
+        </div>
+
+        <div style={{ marginTop: 14, display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10 }}>
+          <Stat label="ТРЕНИРОВОК" value={String(weekSessions.length)} sub={`${sets} ПОДХОДОВ`}/>
+          <Stat label="ОБЪЁМ" value={`${Math.round(totalVolume)}`} sub="КГ"/>
+          <Stat label="ЧИСТЫХ" value={cleanSinceISO ? `${cleanCount} / 7` : '—'} sub="ДНЕЙ"/>
+          <Stat label="НАСТРОЕНИЕ" value={moodAvg > 0 ? moodAvg.toFixed(1) : '—'} sub={`${weekMoods.length} ОТМЕТОК`}/>
+        </div>
+
+        {prsThisWeek > 0 && (
+          <div style={{ marginTop: 12, padding: '8px 12px', background: BRUTE.blood, borderRadius: 6 }}>
+            <span className="brute-display" style={{ color: BRUTE.surface, fontSize: 16, letterSpacing: '0.04em' }}>
+              ★ {prsThisWeek} {prsThisWeek === 1 ? 'РЕКОРД' : 'РЕКОРДА'} ЗА НЕДЕЛЮ
+            </span>
+          </div>
+        )}
+      </BruteCard>
+    </div>
+  );
+}
+
+function Stat({ label, value, sub }) {
+  return (
+    <div style={{
+      padding: '10px 12px', background: BRUTE.surface, borderRadius: 8,
+      border: `1px solid ${BRUTE.border}`,
+    }}>
+      <div className="brute-caption" style={{ color: BRUTE.textFaint, fontSize: 9 }}>{label}</div>
+      <div className="brute-mono" style={{ color: BRUTE.text, fontSize: 22, fontWeight: 700, marginTop: 2, lineHeight: 1 }}>
+        {value}
+      </div>
+      {sub && <div className="brute-caption" style={{ color: BRUTE.textFaint, fontSize: 9, marginTop: 2 }}>{sub}</div>}
+    </div>
+  );
 }
 
 function StatChip({ label, value }) {
