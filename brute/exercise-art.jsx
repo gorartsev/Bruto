@@ -629,6 +629,28 @@ function ArtReverseFly({ color }) {
   );
 }
 
+function ArtBearCrawl({ color }) {
+  const S = exStyle(color);
+  return (
+    <svg viewBox="0 0 100 100" width="100%" height="100%">
+      <line x1="6" y1="84" x2="94" y2="84" {...S}/>
+      <g className="ex-walk">
+        {/* head + horizontal back */}
+        <circle cx="20" cy="50" r="6" {...S}/>
+        <path d="M26 52 L78 50" {...S}/>
+        {/* front arms (planted) */}
+        <path d="M28 52 L30 78" {...S}/>
+        <path d="M34 52 L40 78" {...S}/>
+        {/* rear legs (knees off ground) */}
+        <path d="M70 50 L60 78" {...S}/>
+        <path d="M76 50 L78 78" {...S}/>
+        {/* motion lines behind */}
+        <path d="M82 60 L92 60 M82 66 L96 66" stroke={color} strokeWidth="1.5" strokeLinecap="round"/>
+      </g>
+    </svg>
+  );
+}
+
 // ─── Placeholder ────────────────────────────────────────────────────────────
 function ArtPlaceholder({ color }) {
   const S = exStyle(color);
@@ -674,6 +696,7 @@ const ART_MAP = {
   hangingLeg:     ArtHangingLeg,
   prowler:        ArtProwler,
   bikeZ2:         ArtBike,
+  bearCrawl:      ArtBearCrawl,
   // ── New finisher art (v4) ──
   dbCurl:         ArtDBCurl,
   hammerCurl:     ArtHammerCurl,

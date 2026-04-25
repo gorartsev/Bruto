@@ -26,8 +26,11 @@ const EXERCISES = {
   dbBench:        { key: 'dbBench',    lift: null,  name: 'ЖИМ ГАНТЕЛЕЙ',    nameEn: 'DUMBBELL BENCH', cat: 'acc', unit: 'kg' },
   dbRow:          { key: 'dbRow',      lift: null,  name: 'ТЯГА ГАНТЕЛИ',    nameEn: 'DUMBBELL ROW',  cat: 'acc',  unit: 'kg' },
   bbRow:          { key: 'bbRow',      lift: null,  name: 'ТЯГА ШТАНГИ',     nameEn: 'BARBELL ROW',   cat: 'acc',  unit: 'kg' },
-  facePull:       { key: 'facePull',   lift: null,  name: 'ТЯГА К ЛИЦУ',     nameEn: 'FACE PULL',     cat: 'acc',  unit: 'kg' },
-  pullApart:      { key: 'pullApart',  lift: null,  name: 'РАЗВЕДЕНИЕ РЕЗИН.', nameEn: 'BAND PULL-APART', cat: 'acc', unit: 'band' },
+  // facePull (cable) and pullApart (band) — DEPRECATED (no cable / no bands available);
+  // kept in catalog so historical logged sets can still resolve their display name.
+  facePull:       { key: 'facePull',   lift: null,  name: 'ТЯГА К ЛИЦУ',     nameEn: 'FACE PULL',     cat: 'acc',  unit: 'kg', deprecated: true },
+  pullApart:      { key: 'pullApart',  lift: null,  name: 'РАЗВЕДЕНИЕ РЕЗИН.', nameEn: 'BAND PULL-APART', cat: 'acc', unit: 'band', deprecated: true },
+  bearCrawl:      { key: 'bearCrawl',  lift: null,  name: 'МЕДВЕЖЬЯ ПОХОДКА', nameEn: 'BEAR CRAWL',    cat: 'cond', unit: 'm' },
   kbSwing:        { key: 'kbSwing',    lift: null,  name: 'МАХИ ГИРЕЙ',      nameEn: 'KB SWING',      cat: 'acc',  unit: 'kg' },
   gobletSquat:    { key: 'gobletSquat', lift: null, name: 'ГОБЛЕТ',          nameEn: 'GOBLET SQUAT',  cat: 'acc',  unit: 'kg' },
   tgu:            { key: 'tgu',        lift: null,  name: 'TURKISH GET-UP',  nameEn: 'TURKISH GET-UP', cat: 'acc', unit: 'kg' },
@@ -44,7 +47,7 @@ const EXERCISES = {
   skullCrusher:   { key: 'skullCrusher', lift: null, name: 'ФРАНЦУЗСКИЙ ЖИМ',  nameEn: 'SKULL CRUSHER', cat: 'acc',  unit: 'kg' },
   reverseCurl:    { key: 'reverseCurl', lift: null, name: 'ОБРАТНЫЕ СГИБАНИЯ',nameEn: 'REVERSE CURL',  cat: 'acc',  unit: 'kg' },
   reverseFly:     { key: 'reverseFly', lift: null,  name: 'РАЗВ. В НАКЛОНЕ',   nameEn: 'REVERSE FLY',   cat: 'acc',  unit: 'kg' },
-  ringFacePull:   { key: 'ringFacePull', lift: null, name: 'ТЯГА К ЛИЦУ',      nameEn: 'RING FACE PULL', cat: 'acc', unit: 'bw' },
+  ringFacePull:   { key: 'ringFacePull', lift: null, name: 'ТЯГА К ЛИЦУ',      nameEn: 'RING FACE PULL', cat: 'acc', unit: 'bw', deprecated: true },
 };
 
 // cues per lift (main lifts only — accessories display generic tips)
@@ -106,7 +109,7 @@ const P1_TUE = {
     { ex: 'pullup',        sets: 5, reps: 3,  rest: 150, rule: 'lp-pullup',   lift: 'pullup' },
     { ex: 'dbBench',       sets: 3, reps: 10, rest: 90,  rule: 'moderate'    },
     { ex: 'ringRow',       sets: 3, reps: 12, rest: 90,  rule: 'bodyweight', note: 'ноги выше для тяжелее' },
-    { ex: 'ringFacePull',  sets: 4, reps: 15, rest: 60,  rule: 'bodyweight'  },
+    { ex: 'reverseFly',    sets: 4, reps: 15, rest: 60,  rule: 'moderate', note: 'лёгкие гантели · задние дельты' },
     // Biceps finisher
     { ex: 'dbCurl',        sets: 3, reps: 11, rest: 60,  rule: 'moderate', note: 'медленный негатив' },
     { ex: 'hammerCurl',    sets: 2, reps: 12, rest: 60,  rule: 'moderate', note: 'добивай брахиалис' },
@@ -121,7 +124,7 @@ const P1_WED = {
     { ex: 'gobletSquat',   sets: 3, reps: 8, rest: 90,  rule: 'moderate' },
     { ex: 'prowler',       sets: 8, reps: 1, rest: 75,  rule: 'custom',  note: '20м · вперёд / назад · тяжёлый' },
     { ex: 'farmerCarry',   sets: 3, reps: 1, rest: 75,  rule: 'heavy',   note: '40м' },
-    { ex: 'tgu',           sets: 3, reps: 1, rest: 60,  rule: 'moderate', note: 'каждая сторона' },
+    { ex: 'bearCrawl',     sets: 3, reps: 1, rest: 60,  rule: 'custom', note: '15м · координация · корпус' },
     { ex: 'ringPushup',    sets: 3, reps: 10, rest: 60, rule: 'bodyweight', note: 'AMRAP − 2' },
     { ex: 'zottmanCurl',   sets: 3, reps: 10, rest: 60, rule: 'moderate', note: 'опционально' },
   ],
@@ -173,7 +176,7 @@ const P2_TUE = {
     { ex: 'pausedBench',   sets: 3, reps: 3,  rest: 150, rule: 'pct-tm', lift: 'bench', pct: 0.70 },
     { ex: 'pullup',        sets: 5, reps: 4,  rest: 120, rule: 'lp-pullup', lift: 'pullup' },
     { ex: 'dbBench',       sets: 3, reps: 10, rest: 90,  rule: 'moderate' },
-    { ex: 'ringFacePull',  sets: 4, reps: 15, rest: 60,  rule: 'bodyweight' },
+    { ex: 'reverseFly',    sets: 4, reps: 15, rest: 60,  rule: 'moderate', note: 'задние дельты' },
     { ex: 'dbCurl',        sets: 3, reps: 11, rest: 60,  rule: 'moderate' },
     { ex: 'hammerCurl',    sets: 2, reps: 12, rest: 60,  rule: 'moderate' },
   ],
