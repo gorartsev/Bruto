@@ -13,10 +13,10 @@ const BRUTE = {
   orange: '#E85C2C',
 
   // ─── Light-theme semantic tokens ───
-  // Page bg = bone (warm cream), card surface = paper white, text = ink.
-  bg:         '#F4ECD8',
-  surface:    '#FFFFFF',
-  surfaceAlt: '#EBE2CB',     // chip / secondary fill
+  // Concrete-grey palette — reads cleaner with blood red than warm cream.
+  bg:         '#DBDBDB',     // page background
+  surface:    '#FFFFFF',     // primary card surface
+  surfaceAlt: '#D1D1D1',     // chip / secondary fill (slightly darker grey)
   text:       '#0A0A0A',
   textMuted:  '#2A2A2A',
   textFaint:  '#6B6B6B',

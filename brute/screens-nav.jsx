@@ -66,7 +66,7 @@ function ProgramScreen({ onOpenSession }) {
                       style={{
                         aspectRatio: 1, border: 0, cursor: 'pointer',
                         background: st === 'done' ? BRUTE.blood
-                                  : st === 'today' ? BRUTE.bone
+                                  : st === 'today' ? BRUTE.surface
                                   : st === 'skipped' ? BRUTE.surfaceAlt
                                   : 'transparent',
                         borderRadius: 4,

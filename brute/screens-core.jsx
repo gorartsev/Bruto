@@ -673,8 +673,8 @@ function ActiveWorkoutApp({ onExit, onPR, onSessionComplete }) {
 
 const repBtnStyle = {
   width: 36, height: 36, borderRadius: 8,
-  background: BRUTE.bone, border: `1px solid ${BRUTE.ink}`,
-  color: BRUTE.ink, fontFamily: "'Bebas Neue', Impact", fontSize: 22, cursor: 'pointer',
+  background: BRUTE.surface, border: `1px solid ${BRUTE.text}`,
+  color: BRUTE.text, fontFamily: "'Bebas Neue', Impact", fontSize: 22, cursor: 'pointer',
 };
 const sheetBtnStyle = {
   flex: 1, padding: '12px', background: BRUTE.surfaceAlt, border: 0,

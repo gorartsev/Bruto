@@ -33,9 +33,9 @@ function BruteDivider({ color = BRUTE.ink, width = '100%', opacity = 1 }) {
 }
 
 function BruteCard({ tone = 'bone', children, style = {}, grit = 2, padding = 20, radius = 24 }) {
-  // In light theme: bone tone = primary cream card; ink/smoke tones map to white/alt cards.
+  // In light theme: bone tone = primary white card; ink/smoke tones map to alt grey.
   const bg = tone === 'bone' ? BRUTE.surface
-           : tone === 'ink'  ? BRUTE.bone
+           : tone === 'ink'  ? BRUTE.surfaceAlt
                              : BRUTE.surfaceAlt;
   const fg = BRUTE.text;
   return (
